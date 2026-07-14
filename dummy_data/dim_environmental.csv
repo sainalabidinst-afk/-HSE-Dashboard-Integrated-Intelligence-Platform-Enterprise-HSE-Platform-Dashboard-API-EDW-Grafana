@@ -1,0 +1,17 @@
+env_id,parameter_type,parameter_name,monitoring_point,site_id,lab_method,regulatory_limit,unit_of_measure,frequency,data_quality_flag
+ENV-001,Air Quality,PM2.5,North Pit Berm,SITE-A,Gravimetric,50,µg/m³,Hourly,Valid
+ENV-002,Air Quality,PM10,Workers Camp,SITE-A,Gravimetric,150,µg/m³,Hourly,Valid
+ENV-003,Air Quality,SO2,Crushing Plant,SITE-A,UV Fluorescence,365,µg/m³,Hourly,Valid
+ENV-004,Air Quality,NO2,Workshop B,SITE-A,Chemiluminescence,200,µg/m³,Hourly,Valid
+ENV-005,Air Quality,CO,Generator Area,SITE-A,Non-Dispersive IR,10,mg/m³,Hourly,Valid
+ENV-006,Noise,Leq,Drill Rig 05,SITE-A,Sound Level Meter,90,dB(A),Shift,Valid
+ENV-007,Water Quality,BOD,Effluent Pit,SITE-A,Standard Methods 5210,30,mg/L,Daily,Valid
+ENV-008,Water Quality,pH,Effluent Pit,SITE-A,Potentiometric,6-9,pH unit,Daily,Valid
+ENV-009,Air Quality,PM2.5,Processing Plant,SITE-B,Gravimetric,35,µg/m³,Hourly,Valid
+ENV-010,Air Quality,PM10,Process Plant,SITE-B,Gravimetric,150,µg/m³,Hourly,Valid
+ENV-011,Noise,Leq,Crusher Area,SITE-B,Sound Level Meter,85,dB(A),Shift,Valid
+ENV-012,Waste,Hazardous Waste Weight,Camp Waste Facility,SITE-B,Weighbridge,Regulatory,kg,Monthly,Valid
+ENV-013,Waste,Non-Hazardous Waste Weight,Camp Waste Facility,SITE-B,Weighbridge,Regulatory,kg,Monthly,Valid
+ENV-014,Air Quality,PM2.5,Underground Portal,SITE-C,Gravimetric,35,µg/m³,Hourly,Estimated
+ENV-015,Vibration,Daily Vibration,Crusher Foundation,SITE-B,SNI 03-6391,10,mm/s,Daily,Valid
+ENV-016,Air Quality,SO2,Boiler Stack,SITE-B,UV Fluorescence,365,µg/m³,Monthly,Valid

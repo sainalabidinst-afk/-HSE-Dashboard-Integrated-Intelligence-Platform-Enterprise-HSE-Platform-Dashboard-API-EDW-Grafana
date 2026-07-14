@@ -1,0 +1,8 @@
+site_id,site_name,site_type,location_lat,location_long,zone,area_type,site_status,permit_no,managing_director
+SITE-A,Site Alpha Kutai,Mining,-0.4240,116.9830,North Pit,Open Pit,Active,IUP-2024-001,Budi Santoso
+SITE-A-C,Site Alpha Workshop,Construction,-0.4245,116.9835,Workshop,Surface,Active,IUP-2024-001,Budi Santoso
+SITE-A-O,Site Alpha Office,ICT Support,-0.4248,116.9840,Admin Area,Surface,Active,IUP-2024-001,Budi Santoso
+SITE-B,Site Beta Balikpapan,Oil & Gas Support,-1.2653,116.8312,Processing Plant,Surface,Active,IUP-2024-002,Siti Rahayu
+SITE-B-C,Site Beta Contractor Yard,Construction,-1.2658,116.8318,Yard,Surface,Active,IUP-2024-002,Siti Rahayu
+SITE-C,Site Gamma Samarinda,Mining,-0.4966,117.1438,South Pit,Open Pit,Active,IUP-2024-003,Andi Wijaya
+SITE-C-U,Site Gamma Underground,Mining,-0.4970,117.1440,Underground,Underground,Active,IUP-2024-003,Andi Wijaya

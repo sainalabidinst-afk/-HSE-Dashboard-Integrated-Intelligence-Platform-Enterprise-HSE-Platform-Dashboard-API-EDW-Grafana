@@ -1,0 +1,131 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-A",
+        "site_name": "Site Alpha Kutai",
+        "site_type": "Mining",
+        "zone": "North Pit",
+        "status": "Active",
+        "ltifr": 0.42,
+        "trir": 1.08,
+        "incident_count": 5,
+        "near_miss_count": 12
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.9830, -0.4240]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-A-C",
+        "site_name": "Site Alpha Workshop",
+        "site_type": "Construction",
+        "zone": "Workshop",
+        "status": "Active",
+        "ltifr": 0.38,
+        "trir": 0.95,
+        "incident_count": 2,
+        "near_miss_count": 8
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.9835, -0.4245]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-A-O",
+        "site_name": "Site Alpha Office",
+        "site_type": "ICT Support",
+        "zone": "Admin Area",
+        "status": "Active",
+        "ltifr": 0.0,
+        "trir": 0.5,
+        "incident_count": 0,
+        "near_miss_count": 3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.9840, -0.4248]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-B",
+        "site_name": "Site Beta Balikpapan",
+        "site_type": "Oil & Gas Support",
+        "zone": "Processing Plant",
+        "status": "Active",
+        "ltifr": 0.55,
+        "trir": 1.25,
+        "incident_count": 7,
+        "near_miss_count": 15
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.8312, -1.2653]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-B-C",
+        "site_name": "Site Beta Contractor Yard",
+        "site_type": "Construction",
+        "zone": "Yard",
+        "status": "Active",
+        "ltifr": 0.28,
+        "trir": 0.72,
+        "incident_count": 1,
+        "near_miss_count": 5
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.8318, -1.2658]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-C",
+        "site_name": "Site Gamma Samarinda",
+        "site_type": "Mining",
+        "zone": "South Pit",
+        "status": "Active",
+        "ltifr": 0.65,
+        "trir": 1.45,
+        "incident_count": 9,
+        "near_miss_count": 18
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [117.1438, -0.4966]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SITE-C-U",
+        "site_name": "Site Gamma Underground",
+        "site_type": "Mining",
+        "zone": "Underground",
+        "status": "Active",
+        "ltifr": 0.72,
+        "trir": 1.62,
+        "incident_count": 11,
+        "near_miss_count": 22
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [117.1440, -0.4970]
+      }
+    }
+  ]
+}

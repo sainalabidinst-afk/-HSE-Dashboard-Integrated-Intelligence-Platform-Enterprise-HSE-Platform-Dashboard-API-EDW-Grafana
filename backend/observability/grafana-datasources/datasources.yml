@@ -1,0 +1,66 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s
+      queryTimeout: 60s
+      httpMethod: POST
+
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+    jsonData:
+      maxLines: 1000
+      timeout: 60
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: Loki
+        tags: ["job", "instance", "pod", "namespace"]
+        mappedTags:
+          - key: service.name
+            value: service_name
+      serviceMap:
+        datasourceUid: Tempo
+
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    user: postgres
+    database: hse_edw
+    isDefault: false
+    editable: true
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 1800
+      postgresVersion: 15
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD:-postgres123}
+
+  - name: Redis
+    type: redis
+    access: proxy
+    url: redis://redis:6379
+    editable: true
+    jsonData:
+      cluster: false
+      password: ${REDIS_PASSWORD:-}
+      timeout: 5
+      poolingInterval: 5

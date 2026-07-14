@@ -1,0 +1,235 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "HSE Platform Health",
+    "description": "Enterprise Platform Monitoring Dashboard - API, Celery, Database, ETL health metrics",
+    "tags": ["platform", "monitoring", "hse"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "API Request Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(hse_api_requests_total[5m])",
+            "legendFormat": "{{method}} {{endpoint}} {{status_code}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Requests/sec", "format": "reqps"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 2,
+        "title": "API Latency (P95)",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(hse_api_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{method}} {{endpoint}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(hse_api_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P99 - {{method}} {{endpoint}}",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Seconds", "format": "s"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 3,
+        "title": "API Error Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(hse_errors_total[5m])",
+            "legendFormat": "{{error_type}} - {{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Errors/sec", "format": "eps"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Active Users",
+        "type": "gauge",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "hse_active_users",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          }
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 100, "color": "yellow"},
+                {"value": 500, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Celery Task Duration",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(hse_celery_task_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{task_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Seconds", "format": "s"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Database Query Duration",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(hse_db_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{query_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Seconds", "format": "s"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Alerts Generated (24h)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum by (severity) (rate(hse_alerts_total[1h]))",
+            "legendFormat": "{{severity}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Alerts/hour", "format": "short"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 8,
+        "title": "ETL Job Duration",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(hse_etl_duration_seconds_bucket[1h]))",
+            "legendFormat": "P95 - {{job_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Seconds", "format": "s"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 9,
+        "title": "JWT Issued Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 32, "w": 6, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(hse_jwt_issued_total[5m])",
+            "legendFormat": "JWT Issued",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Tokens/sec", "format": "tps"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Failed Login Attempts",
+        "type": "graph",
+        "gridPos": {"x": 6, "y": 32, "w": 6, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(hse_auth_failed_total[5m])",
+            "legendFormat": "Failed Logins",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Attempts/sec", "format": "aps"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 11,
+        "title": "SLI: API Availability",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(hse_api_requests_total{status_code=~\"2..\"}[5m])) / sum(rate(hse_api_requests_total[5m])) * 100",
+            "legendFormat": "API Availability %",
+            "refId": "A"
+          }
+        ],
+        "alert": {
+          "name": "API Availability SLO",
+          "conditions": [
+            {
+              "evaluator": {"type": "lt", "params": [99.9]},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"type": "avg"}
+            }
+          ]
+        },
+        "yaxes": [
+          {"label": "Availability %", "format": "percent", "max": 100, "min": 99},
+          {"format": "short"}
+        ]
+      }
+    ]
+  }
+}

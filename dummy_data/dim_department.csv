@@ -1,0 +1,14 @@
+dept_id,dept_name,dept_type,parent_dept_id,site_id,head_of_dept
+DEPT-MIN,Mining Operations,Mining,,SITE-A,Joko Susilo
+DEPT-CON,Construction & Civil,Construction,,SITE-A-C,Ahmad Fauzi
+DEPT-ICT,ICT & Data Management,ICT,,SITE-A-O,Rina Wulandari
+DEPT-MNT,Mining Maintenance,Maintenance,,SITE-A,Bambang Sutrisno
+DEPT-ENV,Environmental Management,Environmental,,SITE-A-C,Dr. Siti Aminah
+DEPT-EHS,Environmental Health & Safety,HSE,,SITE-A,Maya Indira
+DEPT-PROC,Process Plant Operations,Oil & Gas Support,,SITE-B,Hendra Gunawan
+DEPT-MNT-B,Maintenance & Reliability,Maintenance,,SITE-B,Dedi Prasetyo
+DEPT-HSE,HSE Operations,HSE,,SITE-B,Sari Dewi
+DEPT-SUB,Site Support,Site Support,,SITE-B-C,Yusuf Hidayat
+DEPT-MIN-C,Contractor Mining,Mining,,SITE-C,M. Rizki
+DEPT-HSE-C,HSE Compliance,HSE,,SITE-C,Dewi Lestari
+DEPT-SAF,Safety & Emergency,Safety,,SITE-C-C,Agus Salim

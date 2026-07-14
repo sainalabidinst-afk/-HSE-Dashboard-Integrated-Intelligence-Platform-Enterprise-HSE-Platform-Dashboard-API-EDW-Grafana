@@ -1,0 +1,455 @@
+{
+  "dashboard": {
+    "title": "HSE Real-Time Operations — Site Alpha",
+    "description": "Real-time HSE monitoring dashboard for daily operations. Powered by PostgreSQL + InfluxDB.",
+    "tags": ["hse", "operations", "site-alpha"],
+    "timezone": "Asia/Jakarta",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "15s",
+    "editable": true,
+    "graphTooltip": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "PTW — Open Count",
+        "type": "stat",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "SELECT COUNT(*) FROM fact_hse f JOIN dim_ptw p ON f.ptw_key = p.ptw_id WHERE f.date_key = CURRENT_DATE AND p.ptw_status = 'OPEN' AND f.site_key = '$site'",
+            "rawSql": true,
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 5, "color": "yellow" },
+                { "value": 10, "color": "red" }
+              ]
+            },
+            "mappings": [
+              { "type": "value", "value": "0", "text": "No Active PTW" }
+            ]
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "auto",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        },
+        "links": [
+          {
+            "title": "PTW Register",
+            "url": "/d/ptw-register?var-site=${site:literal}",
+            "type": "dashboard"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "PTW — Closed Today",
+        "type": "stat",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "SELECT COUNT(*) FROM fact_hse f JOIN dim_ptw p ON f.ptw_key = p.ptw_id WHERE f.date_key = CURRENT_DATE AND p.ptw_status = 'CLOSED' AND f.site_key = '$site'",
+            "rawSql": true,
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "yellow" },
+                { "value": 1, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "textMode": "value_and_name"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Manpower — Present Today",
+        "type": "stat",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "SELECT SUM(headcount_present) FROM fact_hse WHERE date_key = CURRENT_DATE AND site_key = '$site'",
+            "rawSql": true,
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 50, "color": "yellow" },
+                { "value": 200, "color": "green" }
+              ]
+            },
+            "unit": "person",
+            "decimals": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "textMode": "value_and_name"
+        },
+        "links": [
+          {
+            "title": "Manpower Detail",
+            "url": "/d/manpower-detail?var-site=${site:literal}",
+            "type": "dashboard"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Near Miss — Today",
+        "type": "stat",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "SELECT SUM(near_miss_count) FROM fact_hse WHERE date_key = CURRENT_DATE AND site_key = '$site'",
+            "rawSql": true,
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 2, "color": "yellow" },
+                { "value": 5, "color": "red" }
+              ]
+            },
+            "unit": "count",
+            "decimals": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "textMode": "value_and_name"
+        },
+        "links": [
+          {
+            "title": "Near Miss Register",
+            "url": "/d/near-miss-register?var-site=${site:literal}",
+            "type": "dashboard"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Incident Stream — Live Feed",
+        "description": "20 latest incidents in chronological order",
+        "type": "table",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 0, "y": 4, "w": 24, "h": 10 },
+        "targets": [
+          {
+            "expr": "SELECT i.incident_id, i.incident_type, i.incident_category, d.dept_name, i.incident_location, i.severity_class, i.case_status, f.created_at FROM fact_hse f JOIN dim_incident i ON f.incident_key = i.incident_id JOIN dim_department d ON f.dept_key = d.dept_id WHERE f.date_key = CURRENT_DATE AND f.site_key = '$site' ORDER BY f.created_at DESC LIMIT 20",
+            "rawSql": true,
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "displayMode": "color-text"
+            }
+          },
+          "overrides": [
+            {
+              "matcher": { "id": "byName", "options": "severity_class" },
+              "properties": [
+                {
+                  "id": "custom.cellColor",
+                  "value": {
+                    "mode": "row",
+                    "rules": [
+                      { "color": { "mode": "fixed", "fixedColor": "red" }, "matcher": { "id": "byValue", "options": "FATAL" }},
+                      { "color": { "mode": "fixed", "fixedColor": "orange" }, "matcher": { "id": "byValue", "options": "SERIOUS" }},
+                      { "color": { "mode": "fixed", "fixedColor": "yellow" }, "matcher": { "id": "byValue", "options": "MODERATE" }},
+                      { "color": { "mode": "fixed", "fixedColor": "green" }, "matcher": { "id": "byValue", "options": "MINOR" }}
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "showHeader": true,
+          "sortBy": [{ "displayName": "Created At", "desc": true }]
+        },
+        "timeFrom": "15m",
+        "timeShift": null
+      },
+      {
+        "id": 20,
+        "title": "Environmental — PM2.5 (24h Trend)",
+        "type": "timeseries",
+        "datasource": "InfluxDB-HSE-IoT",
+        "gridPos": { "x": 0, "y": 14, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "query": "SELECT mean(\"pm25_value\") FROM \"hse_env\" WHERE \"site\" = '$site' AND time > now() - 24h GROUP BY time(5m) fill(previous)",
+            "refId": "A",
+            "legendFormat": "PM2.5 actual",
+            "datasource": { "type": "influxdb", "uid": "InfluxDB-HSE-IoT" }
+          },
+          {
+            "query": "SELECT 35 AS \"threshold\" WHERE time > now() - 24h",
+            "refId": "B",
+            "legendFormat": "Threshold Amber",
+            "datasource": { "type": "influxdb", "uid": "InfluxDB-HSE-IoT" },
+            "hide": false,
+            "color": { "mode": "fixed", "fixedColor": "orange" }
+          },
+          {
+            "query": "SELECT 55 AS \"threshold\" WHERE time > now() - 24h",
+            "refId": "C",
+            "legendFormat": "Threshold Red",
+            "datasource": { "type": "influxdb", "uid": "InfluxDB-HSE-IoT" },
+            "hide": false,
+            "color": { "mode": "fixed", "fixedColor": "red" }
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "µg/m³",
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "pointSize": 3
+            }
+          }
+        },
+        "options": {
+          "tooltip": { "mode": "multi" },
+          "legend": { "showLegend": true, "position": "bottom" },
+          "showPoints": "auto"
+        }
+      },
+      {
+        "id": 21,
+        "title": "Environmental — Gauge Current",
+        "type": "gauge",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 12, "y": 14, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "SELECT env_reading_value FROM fact_hse f JOIN dim_environmental e ON f.env_sample_id = e.env_id WHERE f.site_key = '$site' AND e.parameter_name = 'PM2.5' AND f.date_key = CURRENT_DATE ORDER BY f.created_at DESC LIMIT 1",
+            "rawSql": true,
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "µg/m³",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 35, "color": "orange" },
+                { "value": 55, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true,
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 22,
+        "title": "Equipment Down Time — Active",
+        "type": "stat",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 18, "y": 14, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "SELECT COUNT(*) FROM fact_hse WHERE date_key = CURRENT_DATE AND site_key = '$site' AND equipment_down_count > 0",
+            "rawSql": true,
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 1, "color": "yellow" },
+                { "value": 3, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "textMode": "value_and_name"
+        }
+      },
+      {
+        "id": 23,
+        "title": "Training Expiry — Next 7 Days",
+        "type": "alertList",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 18, "y": 18, "w": 6, "h": 6 },
+        "options": {
+          "show": "current",
+          "alertListOptions": {
+            "maxItems": 10,
+            "onlyAlertsOnDashboard": false,
+            "alertName": "Training Expiry Alert",
+            "alertInstanceLabelFilter": null,
+            "sortOrder": 1
+          }
+        }
+      },
+      {
+        "id": 30,
+        "title": "Noise Level — 24h Trend",
+        "type": "timeseries",
+        "datasource": "InfluxDB-HSE-IoT",
+        "gridPos": { "x": 0, "y": 22, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "query": "SELECT mean(\"noise_value\") FROM \"hse_env\" WHERE \"site\" = '$site' AND time > now() - 24h GROUP BY time(5m) fill(previous)",
+            "refId": "A",
+            "legendFormat": "Noise (Leq)",
+            "datasource": { "type": "influxdb", "uid": "InfluxDB-HSE-IoT" }
+          },
+          {
+            "query": "SELECT 85 AS \"threshold\" WHERE time > now() - 24h",
+            "refId": "B",
+            "legendFormat": "Threshold Amber",
+            "datasource": { "type": "influxdb", "uid": "InfluxDB-HSE-IoT" },
+            "color": { "mode": "fixed", "fixedColor": "orange" }
+          },
+          {
+            "query": "SELECT 90 AS \"threshold\" WHERE time > now() - 24h",
+            "refId": "C",
+            "legendFormat": "Threshold Red",
+            "datasource": { "type": "influxdb", "uid": "InfluxDB-HSE-IoT" },
+            "color": { "mode": "fixed", "fixedColor": "red" }
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "dB(A)",
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10
+            }
+          }
+        }
+      },
+      {
+        "id": 31,
+        "title": "Observation Rate — vs Target",
+        "type": "bargauge",
+        "datasource": "PostgreSQL-HSE",
+        "gridPos": { "x": 12, "y": 22, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "SELECT observation_count FROM fact_hse WHERE date_key = CURRENT_DATE AND site_key = '$site'",
+            "rawSql": true,
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 200,
+            "unit": "count",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 100, "color": "orange" },
+                { "value": 150, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "orientation": "horizontal",
+          "displayMode": "gradient",
+          "showThresholdLabels": true
+        },
+        "description": "Target bulanan: 150 observations"
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "site",
+          "type": "query",
+          "datasource": "PostgreSQL-HSE",
+          "query": "SELECT site_name FROM dim_site ORDER BY site_name",
+          "refresh": 1,
+          "includeAll": false,
+          "multi": false,
+          "current": { "text": "Site Alpha", "value": "Site Alpha" }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Incident Events",
+          "datasource": "PostgreSQL-HSE",
+          "enable": true,
+          "displayTime": true,
+          "query": "SELECT created_at AS time, incident_id || ' - ' || incident_type AS text FROM fact_hse f JOIN dim_incident i ON f.incident_key = i.incident_id WHERE f.site_key = '$site' AND date_key = CURRENT_DATE AND f.created_at IS NOT NULL",
+          "rawSql": true,
+          "iconColor": "red"
+        },
+        {
+          "name": "PTW Events",
+          "datasource": "PostgreSQL-HSE",
+          "enable": true,
+          "displayTime": true,
+          "query": "SELECT sign_in AS time, ptw_id || ' started' AS text FROM dim_ptw WHERE site_id = '$site' AND sign_in IS NOT NULL",
+          "rawSql": true,
+          "iconColor": "blue"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,140 @@
+groups:
+  - name: hse-platform-alerts
+    interval: 30s
+    rules:
+      # API Health
+      - alert: HighErrorRate
+        expr: rate(hse_errors_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/sec on {{ $labels.endpoint }}"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(hse_api_request_duration_seconds_bucket[5m])) > 0.3
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API latency detected"
+          description: "P95 latency is {{ $value }}s on {{ $labels.endpoint }}"
+
+      - alert: APIDown
+        expr: up{job="hse-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "API is down"
+          description: "HSE API has been down for more than 1 minute"
+
+      # Celery Health
+      - alert: CeleryQueueBacklog
+        expr: celery_queue_length > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "Celery queue backlog high"
+          description: "Celery queue has {{ $value }} pending tasks"
+
+      - alert: CeleryTaskFailure
+        expr: rate(celery_task_failure_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          component: celery
+        annotations:
+          summary: "Celery tasks failing"
+          description: "{{ $value }} tasks/sec are failing"
+
+      # Database Health
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database connection pool near capacity"
+          description: "{{ $value }} active connections"
+
+      - alert: DatabaseSlowQueries
+        expr: rate(hse_db_query_duration_seconds_sum[5m]) / rate(hse_db_query_duration_seconds_count[5m]) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database slow queries detected"
+          description: "Average query duration is {{ $value }}s"
+
+      # ETL Health
+      - alert: ETLJobFailed
+        expr: hse_etl_duration_seconds_count{job_name=~".*"} > 0 and hse_etl_duration_seconds_bucket{job_name=~".*", le="+Inf"} == 0
+        for: 10m
+        labels:
+          severity: warning
+          component: etl
+        annotations:
+          summary: "ETL job may have failed"
+          description: "No ETL metrics received for {{ $labels.job_name }}"
+
+      - alert: ETLJobSlow
+        expr: histogram_quantile(0.95, rate(hse_etl_duration_seconds_bucket[1h])) > 900
+        for: 1h
+        labels:
+          severity: warning
+          component: etl
+        annotations:
+          summary: "ETL job taking too long"
+          description: "P95 ETL duration is {{ $value }}s for {{ $labels.job_name }}"
+
+      # Alert System Health
+      - alert: AlertProcessingFailure
+        expr: rate(hse_errors_total{error_type="alert_processing"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+          component: alerting
+        annotations:
+          summary: "Alert processing failures"
+          description: "Alert engine is experiencing errors"
+
+      # Security
+      - alert: FailedLoginSpike
+        expr: rate(hse_errors_total{error_type="auth_failed"}[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Spike in failed login attempts"
+          description: "{{ $value }} failed logins/sec detected"
+
+      # Resource Usage
+      - alert: HighCPU
+        expr: rate(container_cpu_usage_seconds_total[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: HighMemory
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}%"

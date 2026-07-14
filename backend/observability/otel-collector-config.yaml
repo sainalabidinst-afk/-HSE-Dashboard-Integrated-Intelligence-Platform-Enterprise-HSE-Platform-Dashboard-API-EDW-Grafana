@@ -1,0 +1,56 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Prometheus receiver for scraping metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'hse-api'
+          static_configs:
+            - targets: ['api:8000']
+          metrics_path: '/metrics'
+          scrape_interval: 15s
+
+exporters:
+  # Export traces to Tempo
+  otlp/tempo:
+    endpoint: tempo:4317
+    insecure: true
+
+  # Export metrics to Prometheus
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    const_labels:
+      environment: production
+
+  # Export logs to Loki
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+
+  # Debug exporter (optional)
+  logging:
+    loglevel: debug
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp/tempo, logging]
+
+    metrics:
+      receivers: [otlp, prometheus]
+      exporters: [prometheus, logging]
+
+    logs:
+      receivers: [otlp]
+      exporters: [loki, logging]
+
+  # Telemetry for the collector itself
+  telemetry:
+    metrics:
+      address: 0.0.0.0:8888

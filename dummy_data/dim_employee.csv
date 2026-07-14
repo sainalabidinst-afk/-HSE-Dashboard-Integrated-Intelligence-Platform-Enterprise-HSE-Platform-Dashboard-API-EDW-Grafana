@@ -1,0 +1,21 @@
+employee_id,employment_type,nationality,job_title,job_grade,site_id,department_id,certification_lvl,hse_training_due,medical_clearance
+EMP-001,Employee,Indonesian,Mine Superintendent,SPV-1,SITE-A,DEPT-MIN,SMKP L3,2025-12-31,2025-06-30
+EMP-002,Employee,Indonesian,Heavy Equipment Operator,HLR-3,SITE-A,DEPT-MIN,SMKP L2,2025-09-30,2025-03-31
+EMP-003,Employee,Indonesian,Safety Officer,SPV-2,SITE-A,DEPT-EHS,ISO 45001 Lead,2026-01-31,2025-07-31
+EMP-004,Contractor,Indonesian,Drilling Technician,TECH-2,SITE-A,DEPT-MNT,SMKP L2,2025-08-31,2025-08-31
+EMP-005,Contractor,Indonesian,HSE Supervisor,SPV-2,SITE-A,DEPT-EHS,SMKP L3,2025-11-30,2025-05-31
+EMP-006,Employee,Indonesian,ICT Specialist,SPV-3,SITE-A-O,DEPT-ICT,AWS Cloud Practitioner,2025-10-31,2025-04-30
+EMP-007,Contractor,Indonesian,Excavator Operator,TECH-3,SITE-A,DEPT-MIN,SMKP L1,2025-07-31,2025-07-31
+EMP-008,Employee,Indonesian,Environmental Specialist,PROF-1,SITE-A-C,DEPT-ENV,ISO 14001 Lead,2026-03-31,2025-09-30
+EMP-009,Contractor,Indonesian,Surveyor,TECH-2,SITE-A,DEPT-MIN,SMKP L2,2025-12-31,2025-06-30
+EMP-010,Employee,Indonesian,Civil Engineer,PROF-2,SITE-A-C,DEPT-CON,SMKP L3,2026-02-28,2025-08-31
+EMP-011,Employee,Indonesian,Maintenance Supervisor,SPV-2,SITE-A,DEPT-MNT,SMKP L3,2025-10-31,2025-04-30
+EMP-012,Contractor,Indonesian,Loader Operator,TECH-1,SITE-A,DEPT-MIN,SMKP L1,2025-09-30,2025-03-31
+EMP-013,Employee,Indonesian,Crushing Plant Operator,HLR-2,SITE-B,DEPT-PROC,SMKP L2,2025-11-30,2025-05-31
+EMP-014,Contractor,Indonesian,Laboratory Tech,TECH-2,SITE-B,DEPT-ENV,ISO 14001,2025-08-31,2025-08-31
+EMP-015,Employee,Indonesian,HSE Manager,PROF-2,SITE-B,DEPT-HSE,SMKP L3 + ISO 45001 Lead,2026-06-30,2025-12-31
+EMP-016,Employee,Indonesian,Instrumentation Tech,TECH-2,SITE-B,DEPT-PROC,SMKP L2,2025-10-31,2025-04-30
+EMP-017,Contractor,Indonesian,Warehouse Staff,OPR-1,SITE-B-C,DEPT-SUB,SMKP L1,2025-07-31,2025-07-31
+EMP-018,Employee,Indonesian,Drill Rig Operator,TECH-3,SITE-C,DEPT-MIN-C,SMKP L3,2026-01-31,2025-07-31
+EMP-019,Contractor,Indonesian,Safety Observer,TECH-2,SITE-C,DEPT-HSE-C,SMKP L2,2025-09-30,2025-05-31
+EMP-020,Employee,Indonesian,QA/QC Engineer,PROF-2,SITE-C,DEPT-SAF,ISO 9001 + SMKP L3,2026-04-30,2025-10-31

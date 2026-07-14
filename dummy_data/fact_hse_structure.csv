@@ -1,0 +1,1 @@
+incident_id,date_key,site_key,dept_key,emp_key,contractor_key,equip_key,ptw_key,incident_key,man_hours_worked,lti_count,mti_count,fai_count,near_miss_count,fatality_count,property_dmg_count,env_incident_count,inspection_count,observation_count,ptw_issued_count,ptw_violation_count,training_passed_count

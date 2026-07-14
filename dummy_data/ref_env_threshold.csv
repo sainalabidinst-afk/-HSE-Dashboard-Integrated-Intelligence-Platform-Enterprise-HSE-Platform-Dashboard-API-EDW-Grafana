@@ -1,0 +1,20 @@
+threshold_id,site_id,parameter_name,threshold_value,threshold_unit,alert_amber,alert_red,regulatory_source,active_from,active_to,notes
+THR-001,SITE-A,PM2.5,50,µg/m³,50,80,AMDAL 2023,2025-01-01,2025-12-31,Kab. Kutai override (lebih tinggi dari nasional)
+THR-002,SITE-A,PM10,200,µg/m³,200,300,AMDAL 2023,2025-01-01,2025-12-31,Kab. Kutai override
+THR-003,SITE-A,Noise,90,dB(A),90,100,Perda Kab. Kutai,2025-01-01,2025-12-31,Area industri
+THR-004,SITE-A-C,Noise,85,dB(A),85,90,PermenLHK,2025-01-01,2025-12-31,Camp/kantor
+THR-005,SITE-A-C,PM2.5,35,µg/m³,35,55,PermenLHK No.13/2023,2025-01-01,2025-12-31,Default WHO
+THR-006,SITE-A-C,PM10,150,µg/m³,150,250,PermenLHK,2025-01-01,2025-12-31,Default
+THR-007,SITE-A-C,SO2,365,µg/m³,365,500,PermenLHK,2025-01-01,2025-12-31,Default
+THR-008,SITE-A-C,NO2,200,µg/m³,200,300,PermenLHK,2025-01-01,2025-12-31,Default
+THR-009,SITE-A-C,CO,10,mg/m³,10,15,PermenLHK,2025-01-01,2025-12-31,8h avg
+THR-010,SITE-A-C,Vibration,5,mm/s,5,8,SNI 03-6391,2025-01-01,2025-12-31,8h exposure
+THR-011,SITE-A-C,Water BOD,30,mg/L,30,50,AMDAL,2025-01-01,2025-12-31,Effluent pit
+THR-012,SITE-A-C,Water pH,6-9,pH unit,6-9,5.5-9.5,AMDAL,2025-01-01,2025-12-31,Effluent pit
+THR-013,SITE-B,PM2.5,35,µg/m³,35,55,PermenLHK No.13/2023,2025-01-01,2025-12-31,Kota Balikpapan
+THR-014,SITE-B,Noise,85,dB(A),85,90,PermenLHK,2025-01-01,2025-12-31,Default
+THR-015,SITE-B,PM10,150,µg/m³,150,250,PermenLHK,2025-01-01,2025-12-31,Default
+THR-016,SITE-B,SO2,365,µg/m³,365,500,PermenLHK,2025-01-01,2025-12-31,Default
+THR-017,SITE-B-C,PM2.5,35,µg/m³,35,55,PermenLHK,2025-01-01,2025-12-31,Yard area
+THR-018,SITE-C,PM2.5,35,µg/m³,35,55,PermenLHK No.13/2023,2025-01-01,2025-12-31,Default
+THR-019,SITE-C,Noise,85,dB(A),85,90,PermenLHK,2025-01-01,2025-12-31,Default

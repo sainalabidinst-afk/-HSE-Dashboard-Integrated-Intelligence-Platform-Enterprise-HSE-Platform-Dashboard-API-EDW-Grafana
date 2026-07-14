@@ -1,0 +1,364 @@
+version: '3.8'
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  secret_key:
+    file: ./secrets/secret_key.txt
+  smtp_password:
+    file: ./secrets/smtp_password.txt
+  grafana_password:
+    file: ./secrets/grafana_password.txt
+  pgadmin_password:
+    file: ./secrets/pgadmin_password.txt
+  influxdb_password:
+    file: ./secrets/influxdb_password.txt
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: hse-postgres
+    environment:
+      POSTGRES_DB: hse_edw
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../sql/hse_edw_setup.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # PostgreSQL Backup Service
+  postgres-backup:
+    image: postgres:15-alpine
+    container_name: hse-postgres-backup
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: hse_edw
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      BACKUP_DIR: /backups
+      BACKUP_RETENTION_DAYS: 30
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_backup_data:/backups
+      - ./scripts/backup.sh:/scripts/backup.sh:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "apk add --no-cache dcron && echo '0 2 * * * /scripts/backup.sh >> /var/log/backup.log 2>&1' > /etc/crontabs/root && crond -f -l 8"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - backup
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: hse-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # FastAPI Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hse-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/hse_edw
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_ENABLED=true
+      - DEBUG=false
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-strong-secret}
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - ALERT_EMAIL_ENABLED=true
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - ALERT_FROM_EMAIL=${ALERT_FROM_EMAIL:-}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=hse-api
+    secrets:
+      - secret_key
+      - smtp_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ./logs:/app/logs
+      - ./evidence:/app/evidence
+    restart: unless-stopped
+    profiles:
+      - app
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hse-celery
+    command: celery -A app.utils.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/hse_edw
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_ENABLED=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=hse-celery-worker
+    secrets:
+      - secret_key
+      - smtp_password
+    depends_on:
+      - postgres
+      - redis
+      - otel-collector
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    profiles:
+      - app
+
+  # Celery Beat (scheduler for periodic tasks like alert evaluation)
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hse-celery-beat
+    command: celery -A app.utils.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/hse_edw
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_ENABLED=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=hse-celery-beat
+    secrets:
+      - secret_key
+      - smtp_password
+    depends_on:
+      - postgres
+      - redis
+      - otel-collector
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    profiles:
+      - app
+
+  # =============================================
+  # OBSERVABILITY STACK
+  # =============================================
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.91.0
+    container_name: hse-otel-collector
+    command: ["/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./observability/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus metrics
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: hse-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    depends_on:
+      - otel-collector
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: hse-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_password
+      - GF_INSTALL_PLUGINS=postgres,influxdb,grafana-piechart-panel,grafana-worldmap-panel,redis-datasource
+      - GF_SERVER_ROOT_URL=${GRAFANA_URL:-http://localhost:3000}
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/platform-health.json
+    secrets:
+      - grafana_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana-dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./observability/grafana-datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+      - otel-collector
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Loki (Log aggregation)
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: hse-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+      - ./observability/loki-config.yaml:/etc/loki/local-config.yaml:ro
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Tempo (Distributed tracing)
+  tempo:
+    image: grafana/tempo:2.3.0
+    container_name: hse-tempo
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "3200:3200"   # Tempo HTTP
+    volumes:
+      - tempo_data:/tmp/tempo
+      - ./observability/tempo-config.yaml:/etc/tempo/tempo.yaml:ro
+    command: -config.file=/etc/tempo/tempo.yaml
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # PgAdmin (Database management UI)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: hse-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@hse.local}
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+      PGADMIN_LISTEN_PORT: 80
+    secrets:
+      - pgadmin_password
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+    restart: unless-stopped
+
+  # Nginx (Reverse proxy for API + Dashboard)
+  nginx:
+    image: nginx:alpine
+    container_name: hse-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../dashboard:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+    profiles:
+      - proxy
+
+  # PostgreSQL Backup Service
+  postgres-backup:
+    image: postgres:15-alpine
+    container_name: hse-postgres-backup
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: hse_edw
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      BACKUP_DIR: /backups
+      BACKUP_RETENTION_DAYS: 30
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_backup_data:/backups
+    command: >
+      sh -c "
+        echo 'Starting PostgreSQL backup service...' &&
+        echo '0 2 * * * /scripts/backup.sh >> /var/log/backup.log 2>&1' > /etc/crontabs/root &&
+        crond -f -l 8
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - backup
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  grafana_data:
+    driver: local
+  influxdb_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  loki_data:
+    driver: local
+  tempo_data:
+    driver: local
+  postgres_backup_data:
+    driver: local

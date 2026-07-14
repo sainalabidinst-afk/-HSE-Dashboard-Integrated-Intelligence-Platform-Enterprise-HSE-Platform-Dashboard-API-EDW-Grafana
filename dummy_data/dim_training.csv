@@ -1,0 +1,21 @@
+training_id,training_program,training_type,certification_name,cert_validity_months,competency_area,mandatory_frequency
+TRN-001,Safety Induction,Induction,General Safety,24,Site Safety,Annual
+TRN-002,Working at Height,Technical,Wah Atas Tinggi,12,Working at Height,Annual
+TRN-003,Confined Space Entry,Technical,Confined Space Entry,12,Confined Space,Annual
+TRN-004,Fire Fighting,Technical,Fire Fighting,12,Fire Safety,Biannual
+TRN-005,First Aid,Technical,First Aid CPR,24,Emergency Response,Biannual
+TRN-006,Defensive Driving,Technical,Defensive Driving,12,Vechile Safety,Annual
+TRN-007,Scaffold Inspector,Technical,Scaffold Inspection,12,Lifting Safety,Biannual
+TRN-008,Crane Operator,Technical,Crane Operation License,12,Lifting Safety,Annual
+TRN-009,Forklift Operation,Technical,Forklift License,12,Lifting Safety,Annual
+TRN-010,HSE Committee,Leadership,HSE Committee Member,36,Leadership,Biannual
+TRN-011,ISO 45001 Awareness,Compliance,ISO 45001 Foundation,36,Compliance,Every 3 years
+TRN-012,ISO 14001 Awareness,Compliance,ISO 14001 Foundation,36,Compliance,Every 3 years
+TRN-013,Hot Work Certification,Technical,Hot Work Permit Holder,12,Hot Work,Annual
+TRN-014,LOTO Certification,Technical,LOTO Authorized,12,Energy Control,Annual
+TRN-015,HIRA/JSA Workshop,Technical,HIRA Facilitator,24,Risk Management,Biannual
+TRN-016,Behavior Based Safety,Leadership,BBS Observer,12,BBS,Annual
+TRN-017,Safety Leadership,Leadership,Safety Leader,24,Leadership,Biannual
+TRN-018,PPE Inspector,Technical,PPE Inspector,12,PPE,Biannual
+TRN-019,Site Emergency Response,Technical,SERT Member,12,Emergency,Annual
+TRN-020,Radiation Safety,Technical,Radiation Worker,12,Radiation,Biannual

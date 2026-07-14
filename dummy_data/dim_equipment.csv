@@ -1,0 +1,11 @@
+equipment_id,equipment_type,category,manufacturer,model,serial_no,installed_at,ownership,current_site_id,current_owner,inspection_type,certification_type,next_inspection,certification_expiry,operational_hours,days_since_last_insp
+EQ-DT-001,Dump Truck,Heavy Equipment,Komatsu,HD785-7,KM-785-2020-001,2020-03-15,Owned,SITE-A,Mining Dept,Annual Inspection,K3 Alat Berat,2025-09-15,2026-03-15,12580,45
+EQ-DT-002,Dump Truck,Heavy Equipment,Komatsu,HD785-7,KM-785-2020-002,2020-05-20,Owned,SITE-A,Mining Dept,Annual Inspection,K3 Alat Berat,2025-08-20,2026-02-20,13200,115
+EQ-EX-001,Excavator,Heavy Equipment,Caterpillar,395FL,CAT-395-2021-001,2021-01-10,Owned,SITE-A,Mining Dept,Annual Inspection,K3 Alat Berat,2025-10-10,2026-04-10,9800,23
+EQ-EX-002,Excavator,Heavy Equipment,Caterpillar,395FL,CAT-395-2021-002,2021-06-15,Owned,SITE-A-C,Construction Dept,Semester Inspection,K3 Alat Berat,2025-12-15,2026-06-15,7500,89
+EQ-DL-001,Drill Rig,Heavy Equipment,Sandvik,DD422i,SV-DD422-2019-001,2019-07-01,Owned,SITE-C-U,underground Dept,Annual Inspection,K3 Alat Berat,2025-09-01,2026-03-01,15600,78
+EQ-CR-001,Crusher,Processing Equipment,Metso,Nordberg C160,MT-C160-2018-001,2018-11-20,Owned,SITE-B,Process Plant,Annual Inspection,K3 Alat Berat,2025-11-20,2026-05-20,18200,12
+EQ-CM-001,Compressor,Mechanical Equipment,Atlas Copco,GA132,AC-GA132-2022-001,2022-02-28,Owned,SITE-B-C,Contractor Yard,Quarterly Inspection,K3 Alat Berat,2025-08-28,2026-02-28,4500,156
+EQ-FK-001,Forklift,Lifting Equipment,Toyota,8FGU25,TY-8FGU-2023-001,2023-04-12,Owned,SITE-A-O,Office,Annual Inspection,K3 AlIFT,2025-12-12,2026-06-12,3200,67
+EQ-CRANE-001,Crane,Lifting Equipment,Liebherr,LTM 1120-2,LR-LTM1120-2019-001,2019-09-15,Owned,SITE-A-C,Construction,Annual Inspection,K3 Alat Angkat,2025-09-15,2026-03-15,8900,34
+EQ-GD-001,Gas Detector,Testing Equipment,BW Technologies,MaxXT II,BW-MX2-2024-001,2024-01-05,Owned,SITE-A,Facility,Semester Inspection,Calibration Certificate,2025-07-05,2026-01-05,0,12
