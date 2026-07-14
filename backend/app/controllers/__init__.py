@@ -4,7 +4,7 @@ Each file handles a specific domain.
 """
 
 from datetime import date, datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm

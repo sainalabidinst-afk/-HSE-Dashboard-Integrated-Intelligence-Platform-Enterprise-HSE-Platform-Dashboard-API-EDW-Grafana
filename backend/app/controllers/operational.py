@@ -4,7 +4,7 @@ All operational module routes.
 """
 
 from datetime import date, datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 import csv
 import io
 

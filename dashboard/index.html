@@ -302,6 +302,113 @@
     </div>
   </div>
 
+  <!-- Near Miss Dashboard -->
+  <div id="view-near-miss-dashboard" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>⚠️ Near Miss Reports</h2>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="HSEApp.navigateTo('near-miss', 'list')">View List</button>
+        </div>
+      </div>
+      <div id="near-miss-dashboard-content"></div>
+    </div>
+  </div>
+
+  <!-- Near Miss List -->
+  <div id="view-near-miss-list" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>⚠️ Near Miss List</h2>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="alert('Near Miss form coming soon')">+ New Near Miss</button>
+          <button class="btn btn-secondary" onclick="HSEApp.navigateTo('near-miss', 'dashboard')">Dashboard</button>
+        </div>
+      </div>
+      <div id="near-miss-list-content"></div>
+    </div>
+  </div>
+
+  <!-- Observations Dashboard -->
+  <div id="view-observations-dashboard" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>👁️ Safety Observations</h2>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="HSEApp.navigateTo('observations', 'list')">View List</button>
+        </div>
+      </div>
+      <div id="observation-dashboard-content"></div>
+    </div>
+  </div>
+
+  <!-- Observations List -->
+  <div id="view-observations-list" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>👁️ Observation List</h2>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="alert('Observation form coming soon')">+ New Observation</button>
+          <button class="btn btn-secondary" onclick="HSEApp.navigateTo('observations', 'dashboard')">Dashboard</button>
+        </div>
+      </div>
+      <div id="observation-list-content"></div>
+    </div>
+  </div>
+
+  <!-- Equipment Dashboard -->
+  <div id="view-equipment-dashboard" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>🔧 Equipment Management</h2>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="HSEApp.navigateTo('equipment', 'list')">View List</button>
+        </div>
+      </div>
+      <div id="equipment-dashboard-content"></div>
+    </div>
+  </div>
+
+  <!-- Equipment List -->
+  <div id="view-equipment-list" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>🔧 Equipment Inspections</h2>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="alert('Equipment inspection form coming soon')">+ New Inspection</button>
+          <button class="btn btn-secondary" onclick="HSEApp.navigateTo('equipment', 'dashboard')">Dashboard</button>
+        </div>
+      </div>
+      <div id="equipment-list-content"></div>
+    </div>
+  </div>
+
+  <!-- HIRA List -->
+  <div id="view-hira-list" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>📋 HIRA / JSA Assessments</h2>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="alert('HIRA form coming soon')">+ New HIRA</button>
+        </div>
+      </div>
+      <div id="hira-list-content"></div>
+    </div>
+  </div>
+
+  <!-- Contractor List -->
+  <div id="view-contractors-list" class="module-view">
+    <div class="module-container on">
+      <div class="page-header">
+        <h2>🏢 Contractor Management</h2>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="alert('Contractor record form coming soon')">+ New Record</button>
+        </div>
+      </div>
+      <div id="contractor-list-content"></div>
+    </div>
+  </div>
+
   <div class="foot">HSE Dashboard v2.0 — Powered by FastAPI Backend<br />Data source: Enterprise HSE Platform API</div>
 </div>
 
