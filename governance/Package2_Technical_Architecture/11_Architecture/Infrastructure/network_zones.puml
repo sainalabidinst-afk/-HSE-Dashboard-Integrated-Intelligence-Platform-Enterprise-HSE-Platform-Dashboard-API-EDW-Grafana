@@ -1,0 +1,142 @@
+@startuml Network Zones & Trust Boundaries
+!theme plain
+
+' TITLE
+title Enterprise HSE Platform — Network Zones & Trust Boundaries
+
+' ZONES
+package "Internet / Public" {
+    [Users\nBrowser/Mobile] as users
+    [External Integrations\nSAP, HRIS, SCADA] as external
+}
+
+package "DMZ (Demilitarized Zone)" {
+    [Nginx\nReverse Proxy\nLoad Balancer] as nginx
+    [WAF\n(Optional)] as waf
+}
+
+package "Application Zone" {
+    [FastAPI\nBackend] as api
+    [Celery\nWorker] as celery
+    [Celery\nBeat] as beat
+    [PgAdmin\n(Optional)] as pgadmin
+}
+
+package "Data Zone" {
+    [PostgreSQL\nPrimary] as pg
+    [PostgreSQL\nReplica] as pg_replica
+    [Redis\nCache + Broker] as redis
+    [pgvector\nEmbeddings] as vector
+}
+
+package "Monitoring Zone" {
+    [Prometheus] as prom
+    [Grafana] as grafana
+    [Loki] as loki
+    [Tempo] as tempo
+    [OTEL\nCollector] as otel
+}
+
+package "Management Zone" {
+    [Backup\nService] as backup
+    [CI/CD\nRunner] as cicd
+}
+
+' FIREWALLS / BOUNDARIES
+component "Firewall 1" as fw1
+component "Firewall 2" as fw2
+component "Firewall 3" as fw3
+
+' TRUST BOUNDARIES
+' Boundary between Internet and DMZ
+ boundary "Trust Boundary 1: Internet → DMZ" as tb1
+' Boundary between DMZ and Application Zone
+ boundary "Trust Boundary 2: DMZ → App" as tb2
+' Boundary between Application and Data Zone
+ boundary "Trust Boundary 3: App → Data" as tb3
+' Boundary between App and Monitoring
+ boundary "Trust Boundary 4: App ↔ Monitoring" as tb4
+
+' CONNECTIONS
+' Internet to DMZ
+users -- tb1
+external -- tb1
+tb1 -- nginx : HTTPS/443\nTLS 1.3
+tb1 -- waf : HTTPS/443\nTLS 1.3
+
+' DMZ to App
+nginx -- tb2
+waf -- tb2
+tb2 -- api : HTTP/8000\nInternal only
+tb2 -- pgadmin : HTTP/5050\nInternal only
+
+' App to Data
+api -- tb3
+celery -- tb3
+beat -- tb3
+tb3 -- pg : TCP/5432\nSSL required
+tb3 -- pg_replica : TCP/5432\nSSL required
+tb3 -- redis : TCP/6379\nNo auth (internal)
+tb3 -- vector : TCP/5432\nSame as PostgreSQL
+
+' App to Monitoring
+api -- tb4
+celery -- tb4
+tb4 -- otel : gRPC/4317\nInternal only
+otel -- prom : Internal
+otel -- loki : Internal
+otel -- tempo : Internal
+
+' Monitoring queries
+grafana -- prom : HTTP/9090\nInternal only
+grafana -- loki : HTTP/3100\nInternal only
+grafana -- tempo : HTTP/3200\nInternal only
+
+' Backup
+backup -- tb3 : TCP/5432\nSSL required
+
+' CI/CD
+cicd -- tb2 : SSH\nJump host only
+
+' SECURITY ZONES
+note right of tb1
+  **Security Controls:**
+  - TLS 1.3 termination
+  - DDoS protection
+  - IP whitelisting (optional)
+  - WAF rules (SQLi, XSS)
+end note
+
+note right of tb2
+  **Security Controls:**
+  - No direct internet access
+  - mTLS between services (optional)
+  - Network policies (K8s)
+end note
+
+note right of tb3
+  **Security Controls:**
+  - PostgreSQL SSL required
+  - Redis no external access
+  - Database firewall rules
+  - Encryption at rest
+end note
+
+note right of tb4
+  **Security Controls:**
+  - Telemetry data internal only
+  - No PII in logs/metrics
+  - Access control on Grafana
+end note
+
+' LEGEND
+legend right
+  | Color | Zone | Trust Level |
+  |<#lightblue>| DMZ | Low trust, internet-facing |
+  |<#lightgreen>| Application | Medium trust, internal services |
+  |<#lightyellow>| Data | High trust, sensitive data |
+  |<#lightgray>| Monitoring | Medium trust, observability |
+  |<#white>| Management | High trust, admin access |
+endlegend
+
+@enduml

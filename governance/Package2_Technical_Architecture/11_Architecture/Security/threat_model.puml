@@ -1,0 +1,168 @@
+@startuml STRIDE Threat Model
+!theme plain
+
+title Enterprise HSE Platform — STRIDE Threat Model
+
+' COMPONENTS
+package "Client Layer" {
+    [Web Browser] as browser
+    [Mobile App] as mobile
+}
+
+package "API Layer" {
+    [Nginx\nReverse Proxy] as nginx
+    [FastAPI\nBackend] as api
+    [Rate Limiter] as ratelimit
+    [Auth Middleware] as auth
+}
+
+package "Business Layer" {
+    [Dashboard\nService] as dashboard_svc
+    [Incident\nService] as incident_svc
+    [PTW\nService] as ptw_svc
+    [Audit\nService] as audit_svc
+    [AI\nService] as ai_svc
+    [Alert\nService] as alert_svc
+}
+
+package "Data Layer" {
+    [PostgreSQL\nEDW] as pg
+    [Redis\nCache] as redis
+    [pgvector\nEmbeddings] as vector
+}
+
+package "Integration Layer" {
+    [SAP\nConnector] as sap
+    [HRIS\nConnector] as hris
+    [SCADA\nConnector] as scada
+    [Email\nGateway] as email
+    [SMS\nGateway] as sms
+}
+
+package "Background Layer" {
+    [Celery\nWorker] as celery
+    [Celery\nBeat] as beat
+}
+
+' THREATS BY CATEGORY
+
+package "Spoofing (S)" {
+    [S1: JWT token theft] as s1
+    [S2: Credential stuffing] as s2
+    [S3: Session fixation] as s3
+}
+
+package "Tampering (T)" {
+    [T1: File upload path traversal] as t1
+    [T2: SQL injection via params] as t2
+    [T3: Audit log modification] as t3
+    [T4: Data modification in transit] as t4
+}
+
+package "Repudiation (R)" {
+    [R1: No audit trail for AI] as r1
+    [R2: Missing user activity logs] as r2
+    [R3: No non-repudiation for approvals] as r3
+}
+
+package "Information Disclosure (I)" {
+    [I1: Sensitive data in logs] as i1
+    [I2: Error messages leak info] as i2
+    [I3: Unencrypted database connections] as i3
+    [I4: PII in JSON responses] as i4
+}
+
+package "Denial of Service (D)" {
+    [D1: No rate limiting] as d1
+    [D2: Large report generation] as d2
+    [D3: Unbounded fact_hse growth] as d3
+    [D4: Celery task flood] as d4
+}
+
+package "Elevation of Privilege (E)" {
+    [E1: RBAC bypass in repositories] as e1
+    [E2: JWT permission escalation] as e2
+    [E3: Missing permission checks] as e3
+}
+
+' THREAT MAPPING
+
+' Spoofing
+s1 -- auth : Threatens\nJWT theft → impersonation
+s2 -- auth : Threatens\nCredential stuffing → account takeover
+s3 -- auth : Threatens\nSession fixation → hijacking
+
+' Tampering
+t1 -- api : Threatens\nPath traversal → arbitrary file access
+t2 -- api : Threatens\nSQL injection → data breach
+t3 -- pg : Threatens\nLog modification → audit failure
+t4 -- api : Threatens\nMITM → data corruption
+
+' Repudiation
+r1 -- ai_svc : Threatens\nNo AI audit trail
+r2 -- api : Threatens\nNo user activity logs
+r3 -- audit_svc : Threatens\nNo non-repudiation
+
+' Information Disclosure
+i1 -- api : Threatens\nPII in logs
+i2 -- api : Threatens\nStack trace leakage
+i3 -- pg : Threatens\nData interception
+i4 -- api : Threatens\nPII exposure
+
+' Denial of Service
+d1 -- ratelimit : Threatens\nService overload
+d2 -- api : Threatens\nResource exhaustion
+d3 -- pg : Threatens\nPerformance degradation
+d4 -- celery : Threatens\nWorker saturation
+
+' Elevation of Privilege
+e1 -- api : Threatens\nHorizontal privilege escalation
+e2 -- auth : Threatens\nPermission escalation
+e3 -- api : Threatens\nUnauthorized access
+
+' MITIGATIONS
+
+note right of s1
+  **Mitigation:**
+  - HTTPS only
+  - Short token expiry (60 min)
+  - Refresh token rotation
+  - Token blacklist (Redis)
+end note
+
+note right of t1
+  **Mitigation:**
+  - Path whitelisting
+  - `os.path.abspath()` validation
+  - Reject `../` patterns
+end note
+
+note right of d1
+  **Mitigation:**
+  - Redis-backed rate limiting
+  - Exponential backoff
+  - IP-based throttling
+end note
+
+note right of e1
+  **Mitigation:**
+  - Repository-level site filtering
+  - Permission checks on all endpoints
+  - Automated permission scanner
+end note
+
+' RISK LEVELS
+
+legend right
+  | Threat | Likelihood | Impact | Risk |
+  | S1 | Medium | High | High |
+  | S2 | High | Medium | High |
+  | T1 | Medium | High | High |
+  | T2 | Low | High | Medium |
+  | D1 | High | Medium | High |
+  | E1 | Medium | High | High |
+  | I1 | Medium | Medium | Medium |
+  | R1 | Medium | Medium | Medium |
+endlegend
+
+@enduml

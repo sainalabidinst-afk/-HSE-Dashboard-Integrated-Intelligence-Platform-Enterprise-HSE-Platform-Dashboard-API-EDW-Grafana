@@ -1,0 +1,73 @@
+@startuml Integration Sequence Diagram
+!theme plain
+
+title Enterprise HSE Platform — Integration Sequence Diagram
+
+actor "User" as user
+participant "FastAPI\nBackend" as api
+participant "Integration\nLayer" as integration
+participant "SAP ERP" as sap
+participant "HRIS" as hris
+participant "SCADA\n(OPC-UA)" as scada
+participant "IoT Gateway\n(MQTT)" as iot
+participant "Email\nGateway" as email
+participant "SMS\nGateway" as sms
+participant "Power BI" as powerbi
+participant "Grafana" as grafana
+participant "PostgreSQL\nEDW" as pg
+
+' SAP Integration Flow
+user -> api : Update equipment master data
+api -> integration : Route to SAP connector
+integration -> sap : PUT /Equipment/{id}\n(OData)
+sap --> integration : 200 OK\nUpdated ETag
+integration --> api : Success response
+api --> user : Equipment updated
+
+' HRIS Daily Sync
+user -> api : Trigger HR sync (scheduled)
+api -> integration : Route to HRIS connector
+integration -> hris : GET /Employees\n(LDAP/REST)
+hris --> integration : 200 OK\nEmployee list
+integration -> pg : UPSERT dim_employee\n(upsert logic)
+pg --> integration : Success
+integration --> api : Sync complete\n(150 employees)
+api --> user : HR sync completed
+
+' SCADA Real-time Data
+scada -> iot : Sensor reading\n(PM2.5: 35 µg/m³)
+iot -> integration : Publish MQTT\nTopic: hse/env/SITE-A
+integration -> api : Webhook/POST\n/api/v1/integrations/scada
+api -> pg : INSERT environmental_reading\n(validated)
+pg --> api : Success
+api -> integration : Trigger alert evaluation
+integration -> email : Send alert email\n(to: hse.officer@company.com)
+email --> integration : 250 OK\nAccepted
+integration --> api : Alert sent
+api --> user : Display alert on dashboard
+
+' Power BI Export
+user -> api : Request data export\n(for Power BI)
+api -> integration : Route to Power BI connector
+integration -> powerbi : POST /datasets/{id}/rows\n(REST/ODBC)
+powerbi --> integration : 200 OK\nRows ingested
+integration --> api : Export complete\n(1000 rows)
+api --> user : Export successful
+
+' Grafana Real-time Metrics
+user -> api : Request dashboard metrics
+api -> integration : Publish to Grafana
+integration -> grafana : POST /api/dashboards/db\n(JSON payload)
+grafana --> integration : 200 OK\nDashboard updated
+integration --> api : Metrics published
+api --> user : Display dashboard
+
+' SMS Alert Flow
+user -> api : Acknowledge alert
+api -> integration : Trigger SMS notification
+integration -> sms : POST /messages\n(REST API)
+sms --> integration : 200 OK\nMessage ID: 12345
+integration --> api : Notification sent
+api --> user : Alert acknowledged\n(SMS sent to PIC)
+
+@enduml

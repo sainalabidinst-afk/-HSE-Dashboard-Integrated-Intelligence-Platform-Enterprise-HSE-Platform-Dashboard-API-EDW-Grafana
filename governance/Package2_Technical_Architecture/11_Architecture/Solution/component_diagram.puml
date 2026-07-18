@@ -1,0 +1,114 @@
+@startuml C4 Component Diagram - API Layer
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_TOP_DOWN()
+' TITLE
+title Enterprise HSE Platform — C4 Component Diagram (API Layer)
+
+' PERSON
+Person(user, "User", "HSE staff, auditor, contractor, admin")
+
+' CONTAINER BOUNDARY
+Container_Boundary(api_container, "FastAPI Backend", "Python 3.11, FastAPI, SQLAlchemy") {
+
+    ' CONTROLLERS
+    Component(auth_controller, "Auth Controller", "FastAPI Router", "Handles login, logout, token refresh, RBAC")
+    Component(dashboard_controller, "Dashboard Controller", "FastAPI Router", "Executive summary, KPIs, trends")
+    Component(incident_controller, "Incident Controller", "FastAPI Router", "Incident CRUD, investigation, workflow")
+    Component(ptw_controller, "PTW Controller", "FastAPI Router", "PTW creation, approval, closure")
+    Component(training_controller, "Training Controller", "FastAPI Router", "Training records, certification")
+    Component(env_controller, "Environmental Controller", "FastAPI Router", "Environmental readings, thresholds")
+    Component(equipment_controller, "Equipment Controller", "FastAPI Router", "Equipment management, inspection")
+    Component(audit_controller, "Audit Controller", "FastAPI Router", "Audit plans, findings, evidence, CAR")
+    Component(alert_controller, "Alert Controller", "FastAPI Router", "Alert rules, active alerts, notification")
+    Component(report_controller, "Report Controller", "FastAPI Router", "Report generation, export CSV/JSON/PDF")
+    Component(data_controller, "Data Controller", "FastAPI Router", "Data quality, validation, health")
+    Component(ai_controller, "AI Controller", "FastAPI Router", "Chat, documents, risk score, compliance")
+    Component(admin_controller, "Admin Controller", "FastAPI Router", "System config, user management")
+
+    ' SERVICES
+    Component(auth_service, "Auth Service", "Python Class", "Authentication, RBAC, session management")
+    Component(dashboard_service, "Dashboard Service", "Python Class", "KPI calculation, aggregation")
+    Component(incident_service, "Incident Service", "Python Class", "Business logic for incidents")
+    Component(ptw_service, "PTW Service", "Python Class", "Business logic for PTW")
+    Component(training_service, "Training Service", "Python Class", "Business logic for training")
+    Component(env_service, "Environmental Service", "Python Class", "Business logic for environmental")
+    Component(equipment_service, "Equipment Service", "Python Class", "Business logic for equipment")
+    Component(audit_service, "Audit Service", "Python Class", "Business logic for audit")
+    Component(alert_service, "Alert Service", "Python Class", "Business logic for alerts")
+    Component(report_service, "Report Service", "Python Class", "Report generation logic")
+    Component(data_service, "Data Quality Service", "Python Class", "Data quality checks")
+    Component(ai_service, "AI Service", "Python Class", "RAG, embeddings, risk scoring")
+
+    ' REPOSITORIES
+    Component(auth_repo, "Auth Repository", "Python Class", "User, role, permission queries")
+    Component(dashboard_repo, "Dashboard Repository", "Python Class", "Dashboard aggregations")
+    Component(incident_repo, "Incident Repository", "Python Class", "Incident data access")
+    Component(ptw_repo, "PTW Repository", "Python Class", "PTW data access")
+    Component(training_repo, "Training Repository", "Python Class", "Training data access")
+    Component(env_repo, "Environmental Repository", "Python Class", "Environmental data access")
+    Component(equipment_repo, "Equipment Repository", "Python Class", "Equipment data access")
+    Component(audit_repo, "Audit Repository", "Python Class", "Audit data access")
+    Component(alert_repo, "Alert Repository", "Python Class", "Alert data access")
+    Component(ai_repo, "AI Repository", "Python Class", "Document and embedding queries")
+
+    ' UTILITIES
+    Component(security_util, "Security Utils", "Python Module", "Password hashing, JWT create/decode")
+    Component(rbac_util, "RBAC Utils", "Python Module", "Permission checking, site filtering")
+    Component(secrets_util, "Secrets Utils", "Python Module", "Docker secrets, Azure Key Vault")
+    Component(celery_util, "Celery Utils", "Python Module", "Task definitions and routing")
+    Component(observability_util, "Observability Utils", "Python Module", "OpenTelemetry setup")
+}
+
+' DATABASE
+ContainerDb(postgres, "PostgreSQL EDW", "PostgreSQL 15", "Primary data store")
+ContainerDb(redis, "Redis", "Redis 7", "Cache, session store, rate limiting")
+
+' RELATIONSHIPS
+' Controllers → Services
+Rel(user, auth_controller, "HTTP", "HTTPS/JSON")
+Rel(user, dashboard_controller, "HTTP", "HTTPS/JSON")
+Rel(user, incident_controller, "HTTP", "HTTPS/JSON")
+Rel(user, ptw_controller, "HTTP", "HTTPS/JSON")
+Rel(user, audit_controller, "HTTP", "HTTPS/JSON")
+Rel(user, ai_controller, "HTTP", "HTTPS/JSON")
+
+Rel(auth_controller, auth_service, "Calls", "Python")
+Rel(dashboard_controller, dashboard_service, "Calls", "Python")
+Rel(incident_controller, incident_service, "Calls", "Python")
+Rel(ptw_controller, ptw_service, "Calls", "Python")
+Rel(audit_controller, audit_service, "Calls", "Python")
+Rel(ai_controller, ai_service, "Calls", "Python")
+
+' Services → Repositories
+Rel(auth_service, auth_repo, "Uses", "Python")
+Rel(dashboard_service, dashboard_repo, "Uses", "Python")
+Rel(incident_service, incident_repo, "Uses", "Python")
+Rel(ptw_service, ptw_repo, "Uses", "Python")
+Rel(audit_service, audit_repo, "Uses", "Python")
+Rel(ai_service, ai_repo, "Uses", "Python")
+
+' Repositories → Database
+Rel(auth_repo, postgres, "Reads/writes", "SQLAlchemy")
+Rel(dashboard_repo, postgres, "Reads", "SQLAlchemy")
+Rel(incident_repo, postgres, "Reads/writes", "SQLAlchemy")
+Rel(ptw_repo, postgres, "Reads/writes", "SQLAlchemy")
+Rel(audit_repo, postgres, "Reads/writes", "SQLAlchemy")
+Rel(ai_repo, postgres, "Reads/writes", "SQLAlchemy")
+
+' Services → Redis
+Rel(auth_service, redis, "Session cache", "Redis protocol")
+Rel(alert_service, redis, "Rate limiting", "Redis protocol")
+Rel(ai_service, redis, "Cache results", "Redis protocol")
+
+' Services → Celery
+Rel(alert_service, celery_util, "Enqueues tasks", "Celery protocol")
+Rel(report_service, celery_util, "Enqueues tasks", "Celery protocol")
+Rel(ai_service, celery_util, "Enqueues tasks", "Celery protocol")
+
+' Utilities used by services
+Rel(auth_service, security_util, "Uses", "Python")
+Rel(auth_service, rbac_util, "Uses", "Python")
+Rel(auth_service, secrets_util, "Uses", "Python")
+
+@enduml

@@ -1,0 +1,87 @@
+@startuml C4 Container Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_TOP_DOWN()
+' TITLE
+title Enterprise HSE Platform — C4 Container Diagram (C4 Level 2)
+
+' PERSON
+Person(user, "User (HSE Staff, Auditor, Contractor)", "Uses the platform via web UI or API")
+
+' CONTAINERS
+Container_Boundary(hse_platform, "Enterprise HSE Platform", "Docker Compose") {
+
+    ' Presentation Layer
+    Container(dashboard, "Dashboard", "HTML/CSS/JS, Chart.js", "Static dashboard for HSE metrics and KPIs")
+    
+    ' API Layer
+    Container(api_gateway, "API Gateway", "Nginx", "Reverse proxy, load balancing, SSL termination")
+    Container(api, "FastAPI Backend", "Python 3.11, FastAPI, SQLAlchemy", "REST API for all HSE operations")
+    
+    ' Background Processing
+    Container(celery_worker, "Celery Worker", "Python 3.11, Celery", "Async task processing: alerts, reports, AI")
+    Container(celery_beat, "Celery Beat", "Python 3.11, Celery", "Scheduled task: alert evaluation, cleanup")
+    
+    ' Data Layer
+    Container(postgres, "PostgreSQL", "15, Postgres", "Primary data store: EDW + operational tables")
+    Container(redis, "Redis", "7, Redis", "Cache, Celery broker, rate limiting")
+    Container(vectordb, "Vector DB (pgvector)", "PostgreSQL + pgvector", "AI embeddings storage and search")
+    
+    ' AI Layer
+    Container(ai_service, "AI Safety Assistant", "Python, OpenAI API", "RAG-based Q&A, risk scoring, compliance")
+    
+    ' Observability
+    Container(prometheus, "Prometheus", "Prometheus", "Metrics collection and alerting")
+    Container(grafana, "Grafana", "Grafana", "Dashboards and visualization")
+    Container(loki, "Loki", "Loki", "Log aggregation")
+    Container(tempo, "Tempo", "Tempo", "Distributed tracing")
+    Container(otel, "OpenTelemetry Collector", "OTEL", "Telemetry collection and export")
+    
+    ' External Access
+    Container(pgadmin, "PgAdmin", "PgAdmin4", "Database management UI")
+    Container(backup, "Backup Service", "PostgreSQL", "Automated daily backups")
+}
+
+' RELATIONSHIPS
+Rel(user, dashboard, "Views HSE dashboard", "HTTPS")
+Rel(user, api, "API calls", "HTTPS/JSON")
+Rel(user, pgadmin, "Database administration", "HTTPS")
+
+Rel(dashboard, api, "Fetches data", "HTTPS/JSON")
+Rel(api_gateway, api, "Routes requests", "HTTP")
+
+Rel(api, postgres, "Reads/writes data", "SQLAlchemy/psycopg2")
+Rel(api, redis, "Cache, rate limiting", "Redis protocol")
+Rel(api, vectordb, "Vector search", "pgvector")
+Rel(api, ai_service, "AI queries", "Internal call")
+Rel(api, otel, "Exports telemetry", "OTLP/gRPC")
+
+Rel(celery_worker, redis, "Task queue", "Redis protocol")
+Rel(celery_worker, postgres, "Reads/writes data", "SQLAlchemy")
+Rel(celery_worker, ai_service, "AI tasks", "Internal call")
+Rel(celery_worker, otel, "Exports telemetry", "OTLP/gRPC")
+
+Rel(celery_beat, redis, "Schedule storage", "Redis protocol")
+Rel(celery_beat, celery_worker, "Triggers tasks", "Celery protocol")
+
+Rel(ai_service, postgres, "Reads documents", "SQLAlchemy")
+Rel(ai_service, vectordb, "Vector search", "pgvector")
+Rel(ai_service, otel, "Exports telemetry", "OTLP/gRPC")
+
+Rel(prometheus, api, "Scrapes metrics", "HTTP/metrics")
+Rel(prometheus, celery_worker, "Scrapes metrics", "HTTP/metrics")
+Rel(prometheus, postgres, "Scrapes metrics", "HTTP/metrics")
+Rel(prometheus, redis, "Scrapes metrics", "Redis exporter")
+
+Rel(grafana, prometheus, "Queries metrics", "HTTP")
+Rel(grafana, loki, "Queries logs", "HTTP")
+Rel(grafana, tempo, "Queries traces", "HTTP")
+
+Rel(loki, api, "Collects logs", "Loki agent")
+Rel(loki, celery_worker, "Collects logs", "Loki agent")
+
+Rel(tempo, otel, "Receives traces", "OTLP/gRPC")
+
+Rel(backup, postgres, "Backs up data", "pg_dump")
+
+@enduml

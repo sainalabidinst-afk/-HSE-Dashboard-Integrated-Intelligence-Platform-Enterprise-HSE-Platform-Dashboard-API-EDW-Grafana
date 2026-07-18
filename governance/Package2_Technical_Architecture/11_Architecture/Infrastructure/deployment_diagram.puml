@@ -1,0 +1,71 @@
+@startuml Deployment Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_TOP_DOWN()
+' TITLE
+title Enterprise HSE Platform — Deployment Diagram (C4 Level 4)
+
+' DEPLOYMENT NODES
+Deployment_Node(docker_host, "Docker Host", "Docker Desktop / Docker Engine") {
+    Container(dashboard, "Dashboard", "HTML/CSS/JS", "Served via Nginx")
+    Container(api, "FastAPI API", "Python 3.11, Uvicorn", "4 workers")
+    Container(celery_worker, "Celery Worker", "Python 3.11", "Async tasks")
+    Container(celery_beat, "Celery Beat", "Python 3.11", "Scheduled tasks")
+    Container(postgres, "PostgreSQL", "15-alpine", "Primary database")
+    Container(redis, "Redis", "7-alpine", "Cache + broker")
+    Container(prometheus, "Prometheus", "Latest", "Metrics collection")
+    Container(grafana, "Grafana", "Latest", "Dashboards")
+    Container(loki, "Loki", "Latest", "Log aggregation")
+    Container(tempo, "Tempo", "Latest", "Distributed tracing")
+    Container(otel, "OpenTelemetry Collector", "Latest", "Telemetry collection")
+    Container(pgadmin, "PgAdmin", "Latest", "DB management UI")
+    Container(backup, "Backup Service", "PostgreSQL", "Daily backups")
+}
+
+Deployment_Node(client_pc, "Client PC / Mobile", "Browser / Mobile App") {
+    Container(browser, "Web Browser", "Chrome/Firefox/Safari", "User interface")
+}
+
+' STORAGE
+Deployment_Node(storage, "Docker Volumes", "Local filesystem") {
+    ContainerDb(postgres_data, "PostgreSQL Data", "Volume", "Database persistence")
+    ContainerDb(redis_data, "Redis Data", "Volume", "Cache persistence")
+    ContainerDb(grafana_data, "Grafana Data", "Volume", "Dashboard persistence")
+    ContainerDb(backup_data, "Backup Data", "Volume", "Backup storage")
+}
+
+' NETWORK
+Network(internet, "Internet", "Public network") {
+    Rel(browser, docker_host, "HTTPS", "443")
+}
+
+' RELATIONSHIPS
+Rel(browser, dashboard, "Serves static files", "HTTP/HTTPS")
+Rel(browser, api, "API calls", "HTTPS/JSON")
+Rel(browser, pgadmin, "DB administration", "HTTPS")
+
+Rel(api, postgres, "Database queries", "TCP/5432")
+Rel(api, redis, "Cache, rate limiting", "TCP/6379")
+Rel(celery_worker, redis, "Task queue", "TCP/6379")
+Rel(celery_worker, postgres, "Database queries", "TCP/5432")
+Rel(backup, postgres, "Backup", "TCP/5432")
+
+' OBSERVABILITY
+Rel(api, otel, "Telemetry", "gRPC/4317")
+Rel(celery_worker, otel, "Telemetry", "gRPC/4317")
+Rel(prometheus, api, "Metrics scrape", "HTTP/8000")
+Rel(prometheus, postgres, "Metrics scrape", "HTTP/9187")
+Rel(prometheus, redis, "Metrics scrape", "HTTP/9121")
+Rel(grafana, prometheus, "Queries", "HTTP/9090")
+Rel(grafana, loki, "Queries", "HTTP/3100")
+Rel(grafana, tempo, "Queries", "HTTP/3200")
+Rel(loki, api, "Log collection", "HTTP/3100")
+Rel(tempo, otel, "Traces", "gRPC/4317")
+
+' PERSISTENCE
+Rel(postgres, postgres_data, "Reads/writes", "Volume mount")
+Rel(redis, redis_data, "Reads/writes", "Volume mount")
+Rel(grafana, grafana_data, "Reads/writes", "Volume mount")
+Rel(backup, backup_data, "Writes backups", "Volume mount")
+
+@enduml

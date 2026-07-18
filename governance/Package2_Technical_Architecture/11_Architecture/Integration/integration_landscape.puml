@@ -1,0 +1,99 @@
+@startuml Integration Landscape
+!theme plain
+
+title Enterprise HSE Platform — Integration Landscape
+
+' SYSTEMS
+package "HSE Platform" {
+    [FastAPI\nBackend] as hse_api
+    [Celery\nWorker] as hse_celery
+    [PostgreSQL\nEDW] as hse_db
+}
+
+package "ERP Systems" {
+    [SAP ERP\nS/4HANA] as sap
+    [SAP B1] as sap_b1
+}
+
+package "HR Systems" {
+    [HRIS\n(Workday/ADP)] as hris
+    [Active Directory] as ad
+}
+
+package "Operational Systems" {
+    [SCADA\n(OPC-UA)] as scada
+    [IoT Gateway\n(MQTT)] as iot
+    [Equipment\nManagement] as equip
+}
+
+package "Communication" {
+    [Email Gateway\n(SMTP/Webhook)] as email
+    [SMS Gateway\n(Twilio/WhatsApp)] as sms
+    [Webhook\nReceiver] as webhook
+}
+
+package "Analytics" {
+    [Power BI] as powerbi
+    [Grafana] as grafana
+}
+
+' INTEGRATIONS
+
+' SAP Integration
+hse_api -- sap : "Bidirectional\nREST/OData\nFinancial data, HR master"
+hse_api -- sap_b1 : "Bidirectional\nREST/OData\nSmall business ERP"
+
+' HRIS Integration
+hse_api -- hris : "Import\nREST/LDAP\nEmployee master data\nDaily sync"
+hse_api -- ad : "Sync\nLDAP\nUser authentication\nReal-time"
+
+' SCADA Integration
+hse_celery -- scada : "Streaming\nOPC-UA/MQTT\nEnvironmental sensors\nReal-time"
+hse_celery -- iot : "Streaming\nMQTT\nIoT devices\nReal-time"
+
+' Equipment Management
+hse_api -- equip : "Import\nREST\nEquipment master data\nWeekly sync"
+
+' Communication
+hse_celery -- email : "Outbound\nSMTP/Webhook\nNotifications, alerts\nOn-demand"
+hse_celery -- sms : "Outbound\nREST API\nSMS alerts\nOn-demand"
+hse_api -- webhook : "Inbound\nWebhook\nExternal events\nReal-time"
+
+' Analytics
+hse_api -- powerbi : "Export\nREST/ODBC\nReports, datasets\nOn-demand"
+hse_api -- grafana : "Export\nJSON/API\nMetrics, dashboards\nReal-time"
+
+' DATABASE SHARING
+hse_api -- hse_db : "Read/Write\nSQLAlchemy\nPrimary data store"
+hse_celery -- hse_db : "Read/Write\nSQLAlchemy\nTask data"
+
+' INTEGRATION PATTERNS
+
+package "Integration Patterns" {
+    [API-First\nREST/OData] as pattern_api
+    [Event-Driven\nMQTT/OPC-UA] as pattern_event
+    [Batch Sync\nLDAP/REST] as pattern_batch
+    [Webhook\nPush notifications] as pattern_webhook
+}
+
+hse_api -- pattern_api : "Uses"
+hse_celery -- pattern_event : "Uses"
+hse_api -- pattern_batch : "Uses"
+hse_api -- pattern_webhook : "Uses"
+
+' PROTOCOL MATRIX
+
+legend right
+  | Integration | Protocol | Direction | Frequency | Status |
+  | SAP ERP | REST/OData | Bidirectional | Real-time | Not Started |
+  | HRIS | REST/LDAP | Import | Daily | Not Started |
+  | Active Directory | LDAP | Sync | Real-time | Not Started |
+  | SCADA | OPC-UA/MQTT | Streaming | Real-time | Not Started |
+  | IoT Gateway | MQTT | Streaming | Real-time | Partial |
+  | Email Gateway | SMTP/Webhook | Outbound | On-demand | Partial |
+  | SMS Gateway | REST API | Outbound | On-demand | Not Started |
+  | Power BI | REST/ODBC | Export | On-demand | Not Started |
+  | Grafana | JSON/API | Export | Real-time | Complete |
+endlegend
+
+@enduml

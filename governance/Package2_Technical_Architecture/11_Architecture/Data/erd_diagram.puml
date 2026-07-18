@@ -1,0 +1,490 @@
+@startuml Simplified ERD
+!theme plain
+
+title Enterprise HSE Platform — Simplified Entity Relationship Diagram
+
+' DIMENSION TABLES
+entity "dim_site" as dim_site {
+  *site_id : VARCHAR(20) <<PK>>
+  --
+  site_name : VARCHAR(200)
+  site_type : VARCHAR(50)
+  location_lat : DECIMAL(10,8)
+  location_long : DECIMAL(11,8)
+  zone : VARCHAR(100)
+  site_status : VARCHAR(20)
+  active_from : DATE
+  active_to : DATE
+}
+
+entity "dim_department" as dim_dept {
+  *dept_id : VARCHAR(20) <<PK>>
+  --
+  dept_name : VARCHAR(100)
+  dept_type : VARCHAR(50)
+  site_id : VARCHAR(20) <<FK>>
+  head_of_dept : VARCHAR(100)
+  active_from : DATE
+  active_to : DATE
+}
+
+entity "dim_employee" as dim_emp {
+  *employee_id : VARCHAR(20) <<PK>>
+  --
+  employment_type : VARCHAR(50)
+  job_title : VARCHAR(100)
+  department_id : VARCHAR(20) <<FK>>
+  site_id : VARCHAR(20) <<FK>>
+  hse_training_due : DATE
+  medical_clearance : DATE
+  active_from : DATE
+  active_to : DATE
+}
+
+entity "dim_equipment" as dim_equip {
+  *equipment_id : VARCHAR(50) <<PK>>
+  --
+  equipment_type : VARCHAR(100)
+  category : VARCHAR(50)
+  manufacturer : VARCHAR(100)
+  current_site_id : VARCHAR(20) <<FK>>
+  next_inspection : DATE
+  certification_expiry : DATE
+  active_from : DATE
+  active_to : DATE
+}
+
+entity "dim_contractor" as dim_contractor {
+  *contractor_id : VARCHAR(20) <<PK>>
+  --
+  contractor_name : VARCHAR(200)
+  contractor_type : VARCHAR(100)
+  risk_rating : VARCHAR(20)
+  hse_cert_expiry : DATE
+  active_from : DATE
+  active_to : DATE
+}
+
+entity "dim_incident" as dim_incident {
+  *incident_id : VARCHAR(30) <<PK>>
+  --
+  incident_type : VARCHAR(50)
+  incident_category : VARCHAR(100)
+  severity_class : VARCHAR(20)
+  agency_type : VARCHAR(20)
+  incident_cause : VARCHAR(100)
+  case_status : VARCHAR(20)
+  root_cause : TEXT
+  active_from : DATE
+  active_to : DATE
+}
+
+entity "dim_ptw" as dim_ptw {
+  *ptw_id : VARCHAR(30) <<PK>>
+  --
+  ptw_type : VARCHAR(100)
+  ptw_category : VARCHAR(50)
+  site_id : VARCHAR(20) <<FK>>
+  workstation : VARCHAR(200)
+  start_at : TIMESTAMP
+  end_at : TIMESTAMP
+  ptw_status : VARCHAR(20)
+}
+
+entity "dim_training" as dim_training {
+  *training_id : VARCHAR(30) <<PK>>
+  --
+  training_program : VARCHAR(200)
+  training_type : VARCHAR(50)
+  certification_name : VARCHAR(200)
+  competency_area : VARCHAR(100)
+}
+
+entity "dim_environmental" as dim_env {
+  *env_id : VARCHAR(30) <<PK>>
+  --
+  parameter_type : VARCHAR(100)
+  parameter_name : VARCHAR(100)
+  monitoring_point : VARCHAR(200)
+  site_id : VARCHAR(20) <<FK>>
+  regulatory_limit : DECIMAL(15,4)
+  unit_of_measure : VARCHAR(20)
+}
+
+entity "dim_hazard" as dim_hazard {
+  *hazard_id : VARCHAR(20) <<PK>>
+  --
+  hazard_type : VARCHAR(100)
+  hazard_category : VARCHAR(100)
+  risk_rating : VARCHAR(20)
+  control_measure : TEXT
+}
+
+' FACT TABLE
+entity "fact_hse" as fact_hse {
+  *fact_id : BIGSERIAL <<PK>>
+  --
+  date_key : DATE <<FK>>
+  site_key : VARCHAR(20) <<FK>>
+  dept_key : VARCHAR(20) <<FK>>
+  emp_key : VARCHAR(20) <<FK>>
+  equip_key : VARCHAR(50) <<FK>>
+  contractor_key : VARCHAR(20) <<FK>>
+  incident_key : VARCHAR(30) <<FK>>
+  ptw_key : VARCHAR(30) <<FK>>
+  hazard_key : VARCHAR(20) <<FK>>
+  train_key : VARCHAR(30) <<FK>>
+  man_hours_worked : DECIMAL(12,2)
+  lti_count : INT
+  mti_count : INT
+  fai_count : INT
+  near_miss_count : INT
+  fatality_count : INT
+  ptw_issued_count : INT
+  ptw_violation_count : INT
+  training_passed_count : INT
+  audit_score : DECIMAL(5,2)
+  env_reading_value : DECIMAL(15,4)
+  env_exceeded : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+' SECURITY TABLES
+entity "security_users" as sec_users {
+  *user_id : SERIAL <<PK>>
+  --
+  email : VARCHAR(200) <<UQ>>
+  username : VARCHAR(100) <<UQ>>
+  full_name : VARCHAR(200)
+  password_hash : VARCHAR(255)
+  is_active : BOOLEAN
+  is_locked : BOOLEAN
+  failed_login_attempts : INT
+  locked_until : TIMESTAMP
+  password_changed_at : TIMESTAMP
+  must_change_password : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "security_roles" as sec_roles {
+  *role_id : SERIAL <<PK>>
+  --
+  role_name : VARCHAR(50) <<UQ>>
+  role_display_name : VARCHAR(100)
+  parent_role_id : INT <<FK>>
+  is_system_role : BOOLEAN
+  is_active : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "security_permissions" as sec_perms {
+  *permission_id : SERIAL <<PK>>
+  --
+  permission_name : VARCHAR(100) <<UQ>>
+  permission_display_name : VARCHAR(100)
+  module : VARCHAR(50)
+  action : VARCHAR(50)
+  description : TEXT
+  created_at : TIMESTAMP
+}
+
+entity "security_user_role" as sec_user_role {
+  *user_role_id : SERIAL <<PK>>
+  --
+  user_id : INT <<FK>>
+  role_id : INT <<FK>>
+  site_access : VARCHAR(500)
+  department_access : VARCHAR(500)
+  expires_at : TIMESTAMP
+  is_active : BOOLEAN
+  assigned_at : TIMESTAMP
+}
+
+entity "security_sessions" as sec_sessions {
+  *session_id : VARCHAR(255) <<PK>>
+  --
+  user_id : INT <<FK>>
+  ip_address : VARCHAR(45)
+  user_agent : TEXT
+  expires_at : TIMESTAMP
+  is_active : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+' AUDIT TABLES
+entity "audit_plans" as audit_plans {
+  *audit_id : VARCHAR(50) <<PK>>
+  --
+  audit_type : VARCHAR(30)
+  audit_status : VARCHAR(20)
+  audit_title : VARCHAR(200)
+  site_id : VARCHAR(20) <<FK>>
+  lead_auditor : VARCHAR(200)
+  scheduled_start : DATE
+  scheduled_end : DATE
+  findings_count : INT
+  compliance_score : NUMERIC(5,2)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "audit_findings" as audit_findings {
+  *finding_id : VARCHAR(50) <<PK>>
+  --
+  audit_id : VARCHAR(50) <<FK>>
+  finding_type : VARCHAR(20)
+  finding_status : VARCHAR(20)
+  description : TEXT
+  objective_evidence : TEXT
+  root_cause : TEXT
+  corrective_action : TEXT
+  pic : VARCHAR(200)
+  due_date : DATE
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "evidence" as evidence {
+  *evidence_id : VARCHAR(50) <<PK>>
+  --
+  finding_id : VARCHAR(50) <<FK>>
+  incident_id : VARCHAR(30) <<FK>>
+  evidence_type : VARCHAR(20)
+  file_name : VARCHAR(200)
+  file_path : VARCHAR(500)
+  uploaded_by : VARCHAR(200)
+  uploaded_at : TIMESTAMP
+}
+
+entity "audit_trail" as audit_trail {
+  *trail_id : VARCHAR(50) <<PK>>
+  --
+  user_id : INT <<FK>>
+  user_email : VARCHAR(200)
+  action : VARCHAR(100)
+  table_name : VARCHAR(100)
+  record_id : VARCHAR(50)
+  old_values : JSONB
+  new_values : JSONB
+  ip_address : VARCHAR(45)
+  created_at : TIMESTAMP
+}
+
+' ALERT TABLES
+entity "alert_rules" as alert_rules {
+  *rule_id : VARCHAR(50) <<PK>>
+  --
+  rule_name : VARCHAR(200)
+  metric_type : VARCHAR(30)
+  condition : VARCHAR(10)
+  threshold_value : NUMERIC(15,4)
+  severity : VARCHAR(20)
+  site_id : VARCHAR(20) <<FK>>
+  is_active : BOOLEAN
+  cooldown_minutes : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "alerts" as alerts {
+  *alert_id : VARCHAR(50) <<PK>>
+  --
+  rule_id : VARCHAR(50) <<FK>>
+  alert_type : VARCHAR(100)
+  severity : VARCHAR(20)
+  status : VARCHAR(20)
+  site_id : VARCHAR(20) <<FK>>
+  message : TEXT
+  acknowledged_by : VARCHAR(200)
+  resolved_by : VARCHAR(200)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+' AI TABLES
+entity "ai_documents" as ai_docs {
+  *document_id : UUID <<PK>>
+  --
+  title : VARCHAR(500)
+  document_type : VARCHAR(50)
+  source_system : VARCHAR(100)
+  file_name : VARCHAR(500)
+  is_active : BOOLEAN
+  created_by : VARCHAR(200)
+  created_at : TIMESTAMP
+  indexed_at : TIMESTAMP
+}
+
+entity "ai_document_chunks" as ai_chunks {
+  *chunk_id : UUID <<PK>>
+  --
+  document_id : UUID <<FK>>
+  chunk_index : INT
+  text : TEXT
+  tokens : INT
+  embedding : VECTOR(1536)
+  created_at : TIMESTAMP
+}
+
+entity "ai_conversations" as ai_conv {
+  *conversation_id : UUID <<PK>>
+  --
+  user_id : INT <<FK>>
+  title : VARCHAR(500)
+  context_type : VARCHAR(50)
+  is_active : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "ai_messages" as ai_msgs {
+  *message_id : UUID <<PK>>
+  --
+  conversation_id : UUID <<FK>>
+  role : VARCHAR(20)
+  content : TEXT
+  sources : JSONB
+  confidence : FLOAT
+  feedback : VARCHAR(20)
+  tokens_used : INT
+  created_at : TIMESTAMP
+}
+
+' OPERATIONAL TABLES
+entity "incident_reports" as incident_reports {
+  *report_id : VARCHAR(50) <<PK>>
+  --
+  incident_id : VARCHAR(30) <<FK>>
+  site_id : VARCHAR(20) <<FK>>
+  department_id : VARCHAR(20) <<FK>>
+  report_date : DATE
+  category : VARCHAR(100)
+  severity : VARCHAR(20)
+  description : TEXT
+  case_status : VARCHAR(20)
+  is_deleted : BOOLEAN
+  created_by : VARCHAR(200)
+  created_at : TIMESTAMP
+}
+
+entity "ptw_requests" as ptw_requests {
+  *request_id : VARCHAR(50) <<PK>>
+  --
+  ptw_id : VARCHAR(30) <<FK>>
+  site_id : VARCHAR(20) <<FK>>
+  ptw_type : VARCHAR(100)
+  workstation : VARCHAR(200)
+  start_at : TIMESTAMP
+  end_at : TIMESTAMP
+  ptw_status : VARCHAR(20)
+  is_deleted : BOOLEAN
+  created_by : VARCHAR(200)
+  created_at : TIMESTAMP
+}
+
+entity "training_records" as training_records {
+  *record_id : VARCHAR(50) <<PK>>
+  --
+  training_id : VARCHAR(30) <<FK>>
+  site_id : VARCHAR(20) <<FK>>
+  training_name : VARCHAR(200)
+  training_type : VARCHAR(50)
+  result : VARCHAR(20)
+  expiry_date : DATE
+  is_deleted : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity "environmental_readings" as env_readings {
+  *reading_id : VARCHAR(50) <<PK>>
+  --
+  env_id : VARCHAR(30) <<FK>>
+  site_id : VARCHAR(20) <<FK>>
+  reading_date : DATE
+  parameter_name : VARCHAR(100)
+  reading_value : DECIMAL(15,4)
+  exceeded : BOOLEAN
+  is_deleted : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity "equipment_inspections" as equip_insp {
+  *inspection_id : VARCHAR(50) <<PK>>
+  --
+  equipment_id : VARCHAR(50) <<FK>>
+  site_id : VARCHAR(20) <<FK>>
+  inspection_date : DATE
+  inspection_type : VARCHAR(100)
+  result : VARCHAR(20)
+  is_deleted : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+' RELATIONSHIPS
+dim_site ||--o{ dim_dept : "has"
+dim_site ||--o{ dim_emp : "employs"
+dim_site ||--o{ dim_equip : "located at"
+dim_site ||--o{ dim_contractor : "hosts"
+dim_site ||--o{ dim_incident : "site of"
+dim_site ||--o{ dim_ptw : "site of"
+dim_site ||--o{ dim_env : "monitored at"
+
+dim_dept ||--o{ dim_emp : "employs"
+dim_dept ||--o{ fact_hse : "reports by"
+
+dim_emp ||--o{ fact_hse : "works on"
+
+dim_equip ||--o{ fact_hse : "used in"
+dim_equip ||--o{ equip_insp : "inspected in"
+
+dim_contractor ||--o{ fact_hse : "works on"
+
+dim_incident ||--o{ fact_hse : "recorded in"
+dim_incident ||--o{ incident_reports : "reported as"
+
+dim_ptw ||--o{ fact_hse : "recorded in"
+dim_ptw ||--o{ ptw_requests : "requested as"
+
+dim_training ||--o{ fact_hse : "recorded in"
+dim_training ||--o{ training_records : "recorded as"
+
+dim_env ||--o{ fact_hse : "measured in"
+dim_env ||--o{ env_readings : "recorded as"
+
+dim_hazard ||--o{ fact_hse : "associated with"
+
+fact_hse }|--|| dim_site : "site_key"
+fact_hse }|--|| dim_dept : "dept_key"
+fact_hse }|--|| dim_emp : "emp_key"
+fact_hse }|--|| dim_equip : "equip_key"
+fact_hse }|--|| dim_contractor : "contractor_key"
+fact_hse }|--|| dim_incident : "incident_key"
+fact_hse }|--|| dim_ptw : "ptw_key"
+fact_hse }|--|| dim_hazard : "hazard_key"
+fact_hse }|--|| dim_training : "train_key"
+
+sec_users ||--o{ sec_user_role : "has"
+sec_roles ||--o{ sec_user_role : "assigned to"
+sec_roles ||--o{ sec_perms : "has"
+sec_users ||--o{ sec_sessions : "has"
+sec_users ||--o{ audit_trail : "performs"
+
+audit_plans ||--o{ audit_findings : "contains"
+audit_findings ||--o{ evidence : "has"
+audit_findings ||--o{ audit_trail : "tracked in"
+
+alert_rules ||--o{ alerts : "generates"
+
+ai_docs ||--o{ ai_chunks : "chunked into"
+ai_conv ||--o{ ai_msgs : "contains"
+
+incident_reports }|--|| dim_site : "site_id"
+ptw_requests }|--|| dim_site : "site_id"
+training_records }|--|| dim_site : "site_id"
+env_readings }|--|| dim_site : "site_id"
+equip_insp }|--|| dim_site : "site_id"
+
+@enduml

@@ -1,0 +1,50 @@
+@startuml Executive Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_TOP_DOWN()
+' TITLE
+title Enterprise HSE Platform — Executive Context Diagram (C4 Level 1)
+
+' PERSONAS
+Person(c_suite, "C-Suite / Board", "Strategic oversight, budget approval")
+Person(hse_director, "HSE Director", "HSE operations, compliance, reporting")
+Person(site_manager, "Site Manager", "Site operations, PTW approval, incident management")
+Person(hse_officer, "HSE Officer", "Incident reporting, environmental monitoring")
+Person(supervisor, "Supervisor", "PTW creation, equipment inspection")
+Person(contractor, "Contractor", "PTW requests, incident viewing")
+Person(auditor, "Auditor", "Audit findings, evidence management")
+Person(ict_admin, "ICT Admin", "System monitoring, user management")
+
+' SYSTEMS
+System(hse_platform, "Enterprise HSE Platform", "Comprehensive HSE management: Incident, PTW, Training, Environmental, Equipment, Contractor, Audit, AI Assistant")
+System(ext_sap, "SAP ERP", "Finance, HR, procurement data")
+System(ext_hris, "HRIS", "Employee master data")
+System(ext_scada, "SCADA/OPC-UA", "Environmental sensor data")
+System(ext_iot, "IoT Gateway", "Environmental IoT devices")
+System(ext_ad, "Active Directory", "Authentication, user directory")
+System(ext_email, "Email Gateway", "Notifications, alerts")
+System(ext_sms, "SMS Gateway", "SMS notifications")
+System(ext_powerbi, "Power BI", "Advanced analytics and reporting")
+System(ext_grafana, "Grafana", "Real-time monitoring dashboards")
+
+' RELATIONSHIPS
+Rel(c_suite, hse_platform, "Approves budget, reviews KPIs", "Dashboard")
+Rel(hse_director, hse_platform, "Manages HSE operations, compliance reporting", "Web UI")
+Rel(site_manager, hse_platform, "Approves PTW, manages incidents", "Web UI")
+Rel(hse_officer, hse_platform, "Reports incidents, inputs environmental data", "Web UI")
+Rel(supervisor, hse_platform, "Creates PTW, inspects equipment", "Web UI")
+Rel(contractor, hse_platform, "Creates PTW requests, views incidents", "Web UI")
+Rel(auditor, hse_platform, "Reviews audit findings, uploads evidence", "Web UI")
+Rel(ict_admin, hse_platform, "Manages users, monitors system", "Web UI")
+
+Rel(hse_platform, ext_sap, "Syncs finance/HR data", "REST/OData")
+Rel(hse_platform, ext_hris, "Syncs employee data", "REST/LDAP")
+Rel(hse_platform, ext_scada, "Receives environmental sensor data", "OPC-UA/MQTT")
+Rel(hse_platform, ext_iot, "Receives IoT sensor data", "MQTT")
+Rel(hse_platform, ext_ad, "Authenticates users", "LDAP")
+Rel(hse_platform, ext_email, "Sends email notifications", "SMTP/Webhook")
+Rel(hse_platform, ext_sms, "Sends SMS alerts", "REST API")
+Rel(hse_platform, ext_powerbi, "Exports data for reporting", "REST/ODBC")
+Rel(hse_platform, ext_grafana, "Publishes metrics", "JSON/API")
+
+@enduml
