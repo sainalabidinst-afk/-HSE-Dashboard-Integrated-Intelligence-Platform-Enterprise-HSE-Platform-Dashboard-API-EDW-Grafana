@@ -131,6 +131,8 @@ Key variables:
 - `REDIS_URL` - Redis for caching and Celery
 - `CORS_ORIGINS` - Allowed origins for CORS
 - `ALERT_EMAIL_ENABLED` - Enable email notifications
+- `ENABLE_MOCK_EMBEDDINGS` - **Must be `false` in production**; mock embeddings are for development/testing only
+- `OPENAI_API_KEY` - Required for AI Safety Assistant RAG embeddings
 
 ## Architecture
 
@@ -166,10 +168,13 @@ This API is consumed by:
 ## Next Steps
 
 1. ✅ Backend API created
-2. 🔄 Update dashboard to call `/api/dashboard/*` endpoints
-3. 🔄 Implement proper password hashing in auth
-4. 🔄 Add more detailed error handling
-5. 🔄 Add API versioning (v1, v2)
+2. ✅ Database schema with 40+ tables and security models
+3. ✅ RBAC with 9 roles and granular permissions
+4. ✅ AI Safety Assistant with RAG + pgvector
+5. 🔄 Harden security: file upload sanitization, rate limiting, JWT jti validation
+6. 🔄 Implement remaining Celery tasks (ETL, alerts)
+7. 🔄 Add PostgreSQL replication and connection pooling
+8. 🔄 CI/CD with SAST/DAST and blue-green deployment
 
 ## Tech Stack
 

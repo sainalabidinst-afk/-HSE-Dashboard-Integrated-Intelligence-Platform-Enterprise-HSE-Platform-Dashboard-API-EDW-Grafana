@@ -207,7 +207,7 @@ class FactHSE(Base):
     contractor_key = Column(String(20), ForeignKey("hse.dim_contractor.contractor_id"))
     incident_key = Column(String(30), ForeignKey("hse.dim_incident.incident_id"))
     ptw_key = Column(String(30), ForeignKey("hse.dim_ptw.ptw_id"))
-    hazard_key = Column(String(20))
+    hazard_key = Column(String(20), ForeignKey("hse.dim_hazard.hazard_id"))
     train_key = Column(String(30), ForeignKey("hse.dim_training.training_id"))
 
     man_hours_worked = Column(Numeric(12, 2), default=0)

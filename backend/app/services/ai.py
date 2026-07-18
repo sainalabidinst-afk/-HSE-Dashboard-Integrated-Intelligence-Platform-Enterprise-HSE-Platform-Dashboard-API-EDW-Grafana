@@ -70,15 +70,20 @@ class AIService:
     def _generate_embedding(self, text: str) -> Optional[List[float]]:
         """
         Generate embedding for text.
-        Uses OpenAI API if available, otherwise returns mock embedding.
+        Uses OpenAI API if available. Mock embeddings are strictly for development/testing.
         """
+        import os
+
+        enable_mock = os.getenv("ENABLE_MOCK_EMBEDDINGS", "false").lower() == "true"
+
         try:
             import openai
-            import os
 
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
-                return self._mock_embedding(text)
+                if enable_mock:
+                    return self._mock_embedding(text)
+                raise RuntimeError("OPENAI_API_KEY is not set and mock embeddings are disabled")
 
             client = openai.OpenAI(api_key=api_key)
             response = client.embeddings.create(
@@ -87,8 +92,9 @@ class AIService:
             )
             return response.data[0].embedding
         except Exception as e:
-            print(f"Embedding generation failed: {e}, using mock embedding")
-            return self._mock_embedding(text)
+            if enable_mock:
+                return self._mock_embedding(text)
+            raise RuntimeError(f"Embedding generation failed and mock embeddings are disabled: {e}")
 
     def _mock_embedding(self, text: str) -> List[float]:
         """Generate deterministic mock embedding for development/testing."""

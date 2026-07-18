@@ -22,6 +22,8 @@ governance/
 ├── Package2_Technical_Architecture/
 │   ├── Technical_Architecture_Audit.md         # Domains 1-20 + 28
 │   ├── Architecture_Decision_Records.md        # ADRs 001-007
+│   ├── Architecture_Principles_Catalog.md      # 15 governing principles
+│   ├── Technology_Radar.md                     # Adopt/Trial/Assess/Hold
 │   └── 11_Architecture/
 │       ├── README.md                           # Architecture views guide
 │       ├── Executive/
@@ -61,6 +63,8 @@ governance/
 | Executive_Summary.md | Board, CIO, COO, HSE Director | All stakeholders |
 | Technical_Architecture_Audit.md | Solution Architect, Tech Lead, Backend, DevOps | Security, QA |
 | Architecture_Decision_Records.md | Solution Architect, Tech Lead | All technical staff |
+| Architecture_Principles_Catalog.md | Enterprise Architect, Solution Architect | All technical staff |
+| Technology_Radar.md | Enterprise Architect, Tech Lead | All technical staff |
 | Security_Compliance_Assessment.md | Security Team, Internal Audit, External Auditor, Compliance | Legal, Risk |
 | Delivery_Operations_Playbook.md | Project Manager, Scrum Master, Operations, Infrastructure | Engineering leads |
 | Architecture Views (11_Architecture/) | Solution Architect, Enterprise Architect | Security, Compliance |
@@ -77,6 +81,8 @@ Executive_Summary.md
 
 Technical_Architecture_Audit.md
     ├── References: Architecture_Decision_Records.md
+    ├── References: Architecture_Principles_Catalog.md
+    ├── References: Technology_Radar.md
     ├── References: 11_Architecture/ (diagrams)
     ├── References: Security_Compliance_Assessment.md
     └── References: Delivery_Operations_Playbook.md

@@ -298,20 +298,8 @@ CREATE TABLE hse.fact_hse (
 -- SECURITY TABLES
 -- =============================================
 
-CREATE TABLE hse.security_user_role (
-    user_email             VARCHAR(200) PRIMARY KEY,
-    user_name              VARCHAR(200),
-    role_name              VARCHAR(50) NOT NULL,
-    site_access            VARCHAR(500) NOT NULL DEFAULT 'ALL',
-    page_access            VARCHAR(1000) NOT NULL DEFAULT 'ALL',
-    can_export             BOOLEAN DEFAULT FALSE,
-    can_edit               BOOLEAN DEFAULT FALSE,
-    can_configure_alerts   BOOLEAN DEFAULT FALSE,
-    is_active              BOOLEAN DEFAULT TRUE,
-    expires_at             DATE,
-    created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Note: security_user_role is defined later with correct schema (line 450+)
+-- This section intentionally left blank to avoid duplicate table definition
 
 -- =============================================
 -- INDEXES
