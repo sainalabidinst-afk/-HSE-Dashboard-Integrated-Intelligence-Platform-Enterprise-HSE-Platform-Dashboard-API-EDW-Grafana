@@ -114,7 +114,7 @@ const ObservationModule = (() => {
 
         container.innerHTML = `
             <div class="toolbar">
-                <button class="btn btn-primary" onclick="alert('Observation form coming soon')">+ New Observation</button>
+                <button class="btn btn-primary" onclick="HSEApp.navigateTo('observations', 'add')">+ New Observation</button>
                 <button class="btn btn-secondary" onclick="ObservationModule.refreshList()">Refresh</button>
             </div>
             <table>

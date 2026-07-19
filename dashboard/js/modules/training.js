@@ -140,7 +140,7 @@ const TrainingModule = (() => {
         const rows = (data.items || []).map(item => `
             <tr>
                 <td>${item.record_id}</td>
-                <td>${formatDate(item.training_date)}</td>
+                <td>${window.formatDate(item.training_date)}</td>
                 <td>${item.site_id || '-'}</td>
                 <td>${item.training_name || '-'}</td>
                 <td>${item.training_type || '-'}</td>

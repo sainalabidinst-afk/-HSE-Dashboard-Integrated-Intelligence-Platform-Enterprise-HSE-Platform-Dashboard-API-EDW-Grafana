@@ -42,7 +42,14 @@ const HSEApp = (() => {
 
     function $(selector) { return document.querySelector(selector); }
 
-    function showToast(message, type = 'info') {
+    window.showLoading = function(containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '<div class="loading-state">Loading...</div>';
+        }
+    };
+
+    window.showToast = function(message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.textContent = message;
@@ -52,24 +59,17 @@ const HSEApp = (() => {
         else toast.style.background = '#1976d2';
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
-    }
+    };
 
-    function showLoading(containerId) {
-        const container = document.getElementById(containerId);
-        if (container) {
-            container.innerHTML = '<div class="loading-state">Loading...</div>';
-        }
-    }
-
-    function formatDate(dateStr) {
+    window.formatDate = function(dateStr) {
         if (!dateStr) return '-';
         return new Date(dateStr).toLocaleDateString('id-ID');
-    }
+    };
 
-    function formatDateTime(dateStr) {
+    window.formatDateTime = function(dateStr) {
         if (!dateStr) return '-';
         return new Date(dateStr).toLocaleString('id-ID');
-    }
+    };
 
     const modules = {};
 

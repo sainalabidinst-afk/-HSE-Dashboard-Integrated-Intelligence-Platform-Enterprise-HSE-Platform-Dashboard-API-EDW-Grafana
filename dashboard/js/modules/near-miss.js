@@ -114,7 +114,7 @@ const NearMissModule = (() => {
 
         container.innerHTML = `
             <div class="toolbar">
-                <button class="btn btn-primary" onclick="alert('Near Miss form coming soon')">+ New Near Miss</button>
+                <button class="btn btn-primary" onclick="HSEApp.navigateTo('near-miss', 'add')">+ New Near Miss</button>
                 <button class="btn btn-secondary" onclick="NearMissModule.refreshList()">Refresh</button>
             </div>
             <table>

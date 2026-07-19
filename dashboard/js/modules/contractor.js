@@ -46,7 +46,7 @@ const ContractorModule = (() => {
 
         container.innerHTML = `
             <div class="toolbar">
-                <button class="btn btn-primary" onclick="alert('Contractor record form coming soon')">+ New Record</button>
+                <button class="btn btn-primary" onclick="HSEApp.navigateTo('contractors', 'add')">+ New Record</button>
                 <button class="btn btn-secondary" onclick="ContractorModule.refreshList()">Refresh</button>
             </div>
             <table>

@@ -274,7 +274,10 @@ class FactHSE(Base):
 
 class SecurityUserRole(Base):
     __tablename__ = "security_user_role"
-    __table_args__ = {"schema": "hse"}
+    __table_args__ = (
+        UniqueConstraint("user_id", "role_id", name="uq_user_role"),
+        {"schema": "hse"},
+    )
 
     user_role_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("hse.security_users.user_id"), nullable=False)
@@ -286,11 +289,6 @@ class SecurityUserRole(Base):
     assigned_by = Column(String(200))
     expires_at = Column(DateTime)
     is_active = Column(Boolean, default=True)
-
-    __table_args__ = (
-        UniqueConstraint("user_id", "role_id", name="uq_user_role"),
-        {"schema": "hse"},
-    )
 
 
 class SecurityUser(Base):

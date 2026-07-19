@@ -20,7 +20,11 @@ const DashboardModule = (() => {
     }
 
     async function loadDashboardData() {
-        showLoading('dashboard-content');
+        // Show loading on main dashboard view
+        const container = document.getElementById('view-dashboard-dashboard');
+        if (container) {
+            container.classList.add('loading-shimmer');
+        }
 
         try {
             const [summary, alerts] = await Promise.all([
@@ -37,7 +41,7 @@ const DashboardModule = (() => {
     }
 
     function renderKPICards(summary) {
-        const container = document.getElementById('kpi-cards');
+        const container = document.getElementById('execKpi');
         if (!container || !summary || !summary.kpis) return;
 
         container.innerHTML = summary.kpis.map(kpi => {
@@ -54,7 +58,7 @@ const DashboardModule = (() => {
     }
 
     function renderAlerts(alerts) {
-        const container = document.getElementById('active-alerts');
+        const container = document.getElementById('alerts');
         if (!container) return;
 
         if (!alerts || alerts.length === 0) {

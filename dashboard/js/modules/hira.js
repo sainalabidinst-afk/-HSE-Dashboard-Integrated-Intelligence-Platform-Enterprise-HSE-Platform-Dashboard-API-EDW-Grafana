@@ -46,7 +46,7 @@ const HIRAModule = (() => {
 
         container.innerHTML = `
             <div class="toolbar">
-                <button class="btn btn-primary" onclick="alert('HIRA form coming soon')">+ New HIRA</button>
+                <button class="btn btn-primary" onclick="HSEApp.navigateTo('hira', 'add')">+ New HIRA</button>
                 <button class="btn btn-secondary" onclick="HIRAModule.refreshList()">Refresh</button>
             </div>
             <table>

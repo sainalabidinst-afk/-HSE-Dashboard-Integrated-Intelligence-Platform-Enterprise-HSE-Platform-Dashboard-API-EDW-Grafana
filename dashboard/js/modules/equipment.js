@@ -72,7 +72,7 @@ const EquipmentModule = (() => {
 
         container.innerHTML = `
             <div class="toolbar">
-                <button class="btn btn-primary" onclick="alert('Equipment inspection form coming soon')">+ New Inspection</button>
+                <button class="btn btn-primary" onclick="HSEApp.navigateTo('equipment', 'add')">+ New Inspection</button>
                 <button class="btn btn-secondary" onclick="EquipmentModule.refreshList()">Refresh</button>
             </div>
             <table>

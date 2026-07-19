@@ -145,11 +145,11 @@ const PTWModule = (() => {
         const rows = (data.items || []).map(item => `
             <tr>
                 <td>${item.request_id}</td>
-                <td>${formatDate(item.request_date)}</td>
+                <td>${window.formatDate(item.request_date)}</td>
                 <td>${item.site_id || '-'}</td>
                 <td>${item.workstation || '-'}</td>
                 <td>${item.ptw_type || '-'}</td>
-                <td>${formatDateTime(item.start_at)}</td>
+                <td>${window.formatDateTime(item.start_at)}</td>
                 <td><span class="pill ${statusColors[item.ptw_status] || 'gray'}">${item.ptw_status}</span></td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="PTWModule.viewDetail('${item.request_id}')">View</button>

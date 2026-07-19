@@ -22,8 +22,15 @@ governance/
 ├── Package2_Technical_Architecture/
 │   ├── Technical_Architecture_Audit.md         # Domains 1-20 + 28
 │   ├── Architecture_Decision_Records.md        # ADRs 001-007
+│   ├── ADR_Index.md                            # ADR quick reference with status
 │   ├── Architecture_Principles_Catalog.md      # 15 governing principles
 │   ├── Technology_Radar.md                     # Adopt/Trial/Assess/Hold
+│   ├── Decision_Log.md                         # Day-to-day project decisions
+│   ├── Traceability_Matrix.md                  # Business requirements to implementation
+│   ├── Governance_Rules_Catalog.md             # 45 governance rules
+│   ├── ADR-008_Architecture_Validation_Framework.md  # CI architecture gates
+│   ├── ADR-009_Release_Quality_Gates.md        # Release quality gates
+│   ├── ADR-010_Governance_Automation.md        # Automated governance enforcement
 │   └── 11_Architecture/
 │       ├── README.md                           # Architecture views guide
 │       ├── Executive/
@@ -63,8 +70,12 @@ governance/
 | Executive_Summary.md | Board, CIO, COO, HSE Director | All stakeholders |
 | Technical_Architecture_Audit.md | Solution Architect, Tech Lead, Backend, DevOps | Security, QA |
 | Architecture_Decision_Records.md | Solution Architect, Tech Lead | All technical staff |
+| ADR_Index.md | Enterprise Architect, Tech Lead | All technical staff |
 | Architecture_Principles_Catalog.md | Enterprise Architect, Solution Architect | All technical staff |
 | Technology_Radar.md | Enterprise Architect, Tech Lead | All technical staff |
+| Decision_Log.md | Project Manager, Tech Lead | All staff |
+| Traceability_Matrix.md | Business Analyst, QA, Tech Lead | All staff |
+| Governance_Rules_Catalog.md | Tech Lead, Security Lead, DBA | All technical staff |
 | Security_Compliance_Assessment.md | Security Team, Internal Audit, External Auditor, Compliance | Legal, Risk |
 | Delivery_Operations_Playbook.md | Project Manager, Scrum Master, Operations, Infrastructure | Engineering leads |
 | Architecture Views (11_Architecture/) | Solution Architect, Enterprise Architect | Security, Compliance |
@@ -81,8 +92,12 @@ Executive_Summary.md
 
 Technical_Architecture_Audit.md
     ├── References: Architecture_Decision_Records.md
+    ├── References: ADR_Index.md
     ├── References: Architecture_Principles_Catalog.md
     ├── References: Technology_Radar.md
+    ├── References: Decision_Log.md
+    ├── References: Traceability_Matrix.md
+    ├── References: Governance_Rules_Catalog.md
     ├── References: 11_Architecture/ (diagrams)
     ├── References: Security_Compliance_Assessment.md
     └── References: Delivery_Operations_Playbook.md
