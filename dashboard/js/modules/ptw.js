@@ -242,5 +242,18 @@ const PTWModule = (() => {
         }
     }
 
-    return { initStatic, init: initView };
+    async function showAddForm() {
+        const container = document.getElementById('ptw-detail-container'); if (!container) return;
+        showLoading('ptw-detail-container');
+        const sites = window.cachedSites || [{site_id:'SITE-A',site_name:'Site Alpha'},{site_id:'SITE-B',site_name:'Site Beta'}];
+        const opts = sites.map(s => '<option value="' + s.site_id + '">' + s.site_name + '</option>').join('');
+        container.innerHTML = '<div class="page-header"><h2>New PTW</h2><div class="page-actions"><button class="btn btn-secondary" onclick="HSEApp.navigateTo(\'ptw\', \'list\')">Cancel</button><button class="btn btn-primary" onclick="PTWModule.saveForm()">Save</button></div></div><form class="form-container"><div class="form-section"><h3>Basic Information</h3><div class="form-row"><div class="form-group"><label>Date *</label><input type="date" id="ptw-request-date" required /></div><div class="form-group"><label>Site *</label><select id="ptw-site-id" required>' + opts + '</select></div><div class="form-group"><label>PTW Type *</label><select id="ptw-type" required><option value="">Select Type</option><option value="Hot Work">Hot Work</option><option value="Cold Work">Cold Work</option></select></div><div class="form-group"><label>Workstation *</label><input type="text" id="ptw-workstation" required /></div></div><div class="form-row"><div class="form-group full-width"><label>Work Description *</label><textarea id="ptw-work-description" rows="3" required></textarea></div></div></div><div class="form-section"><h3>Hazards</h3><div class="form-row"><div class="form-group full-width"><label>Hazards *</label><textarea id="ptw-hazard" rows="3" required></textarea></div></div></div><div class="form-section"><h3>Schedule</h3><div class="form-row"><div class="form-group"><label>Start *</label><input type="datetime-local" id="ptw-start-at" required /></div><div class="form-group"><label>End *</label><input type="datetime-local" id="ptw-end-at" required /></div><div class="form-group"><label>PIC *</label><input type="text" id="ptw-pic" required /></div></div></div></form>';
+        HSEApp.navigateTo('ptw', 'detail');
+    }
+    async function saveForm() {
+        const data = { request_date: document.getElementById('ptw-request-date').value, site_id: document.getElementById('ptw-site-id').value, ptw_type: document.getElementById('ptw-type').value, workstation: document.getElementById('ptw-workstation').value, work_description: document.getElementById('ptw-work-description').value, hazard_identified: document.getElementById('ptw-hazard').value, start_at: document.getElementById('ptw-start-at').value, end_at: document.getElementById('ptw-end-at').value, pic: document.getElementById('ptw-pic').value };
+        try { await HSEApp.post('/api/ptw/', data); showToast('PTW created', 'success'); HSEApp.navigateTo('ptw', 'list'); } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+    }
+
+    return { initStatic, init: initView, loadList, goToPage, refreshList, viewDetail, showAddForm, saveForm };
 })();
